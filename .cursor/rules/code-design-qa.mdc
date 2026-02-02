@@ -26,3 +26,4 @@ Prioritize and observe the following patterns below. Holistically, the codebase 
 - Safeties
 - Null guarding
 - Exceptional memory management (where applicable) such as memory fencing
+- Avoid negative expressions. Check for true/positive checks intead of false/negative checks.
