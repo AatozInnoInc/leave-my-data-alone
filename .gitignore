@@ -201,6 +201,11 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Node.js
+node_modules/
+.pnpm-store/
+coverage/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
