@@ -8,5 +8,9 @@
     "lint": "eslint . --ext .ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.48",
+    "yaml": "^2.8.2"
   }
 }
