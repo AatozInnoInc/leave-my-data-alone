@@ -8,5 +8,8 @@
     "lint": "eslint . --ext .ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@lmda/core": "workspace:*"
   }
 }
