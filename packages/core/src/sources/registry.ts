@@ -31,6 +31,13 @@ const DEFAULT_SOURCES: readonly SourceDescriptor[] = [
     homepage: 'https://github.com/yueliu1999/Awesome-Jailbreak-on-LLMs',
     tier: 'tier1',
   },
+  {
+    id: `jailbreak_llms`,
+    name: `In-The-Wild Jailbreak Prompts on LLMs`,
+    description: `Academic jailbreak references and datasets.`,
+    homepage: `https://github.com/yueliu1999/Awesome-Jailbreak-on-LLMs`,
+    tier: 'tier1',
+  },
 ];
 
 /**
