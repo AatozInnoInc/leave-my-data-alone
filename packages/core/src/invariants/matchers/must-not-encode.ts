@@ -19,7 +19,7 @@ export const matchMustNotEncode = (
   events: readonly TelemetryEvent[],
   candidateValues: readonly string[],
 ): Violation[] => {
-  // egative checks are appropriate for early exits.
+  // Negative checks are appropriate for early exits.
   if (!invariants || invariants.length === 0 || events.length === 0) {
     return [];
   }

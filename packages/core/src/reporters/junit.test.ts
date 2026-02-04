@@ -22,7 +22,7 @@ const createReport = (passed: boolean, violationDetails?: string): ScenarioRepor
   result: {
     passed,
     violations:
-      passed === true
+      passed
         ? []
         : [
             {

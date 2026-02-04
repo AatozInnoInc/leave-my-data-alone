@@ -2,7 +2,7 @@
 
 import type { ReportBundle, Reporter, ReporterOutput, ScenarioReport } from './types.js';
 
-const formatDuration = (durationMs: number): string => `${durationMs}ms`;
+const formatDuration = (durationMs: number): string => `${String(durationMs)}ms`;
 
 const formatScenarioHeader = (report: ScenarioReport): string => {
   const status = report.result.passed ? 'PASS' : 'FAIL';
@@ -43,7 +43,10 @@ export class ConsoleReporter implements Reporter {
     lines.push('LMDA Report');
     lines.push(`Generated: ${bundle.generatedAt.toISOString()}`);
     lines.push(
-      `Summary: ${bundle.summary.total} total, ${bundle.summary.passed} passed, ${bundle.summary.failed} failed, ${formatDuration(bundle.summary.durationMs)}`,
+      `Summary: ${String(bundle.summary.total)} total,
+        ${String(bundle.summary.passed)} passed,
+        ${String(bundle.summary.failed)} failed,
+        ${formatDuration(bundle.summary.durationMs)}`,
     );
 
     if (bundle.reports.length > 0) {

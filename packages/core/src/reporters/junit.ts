@@ -58,10 +58,10 @@ export class JunitReporter implements Reporter {
     const time = formatDurationSeconds(bundle.summary.durationMs);
     const timestamp = bundle.generatedAt.toISOString();
 
-    const lines: string[] = [];
+  const lines: string[] = [];
     lines.push('<?xml version="1.0" encoding="UTF-8"?>');
     lines.push(
-      `<testsuite name="LMDA" tests="${tests}" failures="${failures}" time="${time}" timestamp="${escapeXml(
+        `<testsuite name="LMDA" tests="${String(tests)}" failures="${String(failures)}" time="${time}" timestamp="${escapeXml(
         timestamp,
       )}">`,
     );

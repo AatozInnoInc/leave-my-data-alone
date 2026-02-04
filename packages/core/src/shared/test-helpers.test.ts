@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   createScenarioYaml,
   InvalidYamlFixtures,
-  type ScenarioYamlBuilder,
 } from './test-helpers.js';
 
 describe('ScenarioYamlBuilder', () => {

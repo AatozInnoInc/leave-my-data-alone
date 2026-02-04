@@ -37,20 +37,24 @@ class StubProvider implements TelemetryProvider {
     this.events = events;
   }
 
-  async configure(_scenario: ScenarioConfig): Promise<void> {
+  configure(_scenario: ScenarioConfig): Promise<void> {
     this.configureCalled = true;
+    return Promise.resolve();
   }
 
   async *execute(messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
     this.messages.push(...messages);
 
+    // Keeps the stub aligned with async generator behavior.
+    await Promise.resolve();
     for (const event of this.events) {
       yield event;
     }
   }
 
-  async teardown(): Promise<void> {
+  teardown(): Promise<void> {
     this.teardownCalled = true;
+    return Promise.resolve();
   }
 }
 
@@ -114,9 +118,9 @@ describe('ScenarioEngine', () => {
 
   it('should surface configure failures', async (): Promise<void> => {
     class ConfigureErrorProvider extends StubProvider {
-      override async configure(_scenario: ScenarioConfig): Promise<void> {
+      override configure(_scenario: ScenarioConfig): Promise<void> {
         this.configureCalled = true;
-        throw new Error('configure failure');
+        return Promise.reject(new Error('configure failure'));
       }
     }
 
@@ -141,6 +145,7 @@ describe('ScenarioEngine', () => {
   it('should surface execute failures and still teardown', async (): Promise<void> => {
     class ExecuteErrorProvider extends StubProvider {
       override async *execute(_messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
+        await Promise.resolve();
         throw new Error('execute failure');
       }
     }
@@ -166,9 +171,9 @@ describe('ScenarioEngine', () => {
 
   it('should surface teardown failures', async (): Promise<void> => {
     class TeardownErrorProvider extends StubProvider {
-      override async teardown(): Promise<void> {
+      override teardown(): Promise<void> {
         this.teardownCalled = true;
-        throw new Error('teardown failure');
+        return Promise.reject(new Error('teardown failure'));
       }
     }
 

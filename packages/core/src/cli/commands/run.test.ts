@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import type { ScenarioConfig } from '../../scenario/types.js';
+import type { Message, ScenarioConfig } from '../../scenario/types.js';
 import { createScenarioYaml } from '../../shared/test-helpers.js';
 import type { TelemetryEvent, TelemetryProvider } from '../../telemetry/types.js';
 import {
@@ -24,11 +24,15 @@ const buildRunScenarioYaml = (): string =>
     .build();
 
 class StubProvider implements TelemetryProvider {
-  public async configure(_scenario: ScenarioConfig): Promise<void> {
-    // No-op.
+  public configure(_scenario: ScenarioConfig): Promise<void> {
+    return Promise.resolve();
   }
 
-  public async *execute(): AsyncGenerator<TelemetryEvent> {
+  public async *execute(
+    _messages: readonly Message[],
+  ): AsyncGenerator<TelemetryEvent> {
+    // Keeps the stub aligned with the async generator contract.
+    await Promise.resolve();
     yield {
       timestamp: new Date(0),
       type: 'llm_output',
@@ -36,8 +40,8 @@ class StubProvider implements TelemetryProvider {
     };
   }
 
-  public async teardown(): Promise<void> {
-    // No-op.
+  public teardown(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
