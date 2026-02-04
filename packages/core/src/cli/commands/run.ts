@@ -237,13 +237,17 @@ export const createRunCommand = (): Command => {
       try {
         const providerFactory = await loadProviderFactory(options.provider, options.providerExport);
         const providerConfig = await loadProviderConfig(options.providerConfig);
-        const runResult = await runScenario({
+        const baseOptions: RunScenarioOptions = {
           scenarioPath,
           providerFactory,
           providerConfig,
           reporterFormat: options.reporter,
-          outputPath: options.output,
-        });
+        };
+        const runOptions =
+          options.output === undefined
+            ? baseOptions
+            : { ...baseOptions, outputPath: options.output };
+        const runResult = await runScenario(runOptions);
 
         process.exitCode = runResult.report.result.passed ? 0 : 1;
       } catch (error) {
