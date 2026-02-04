@@ -3,7 +3,7 @@
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { createSourceAdapterRegistry } from './adapters/types.js';
+import { createDefaultSourceAdapterRegistry } from './adapters/index.js';
 import type { SourceAdapterRegistry, SourceSyncOutcome } from './adapters/types.js';
 import { createSourceRegistry } from './registry.js';
 import type { SourceDescriptor, SourceRegistry } from './registry.js';
@@ -90,6 +90,33 @@ const createFailureReport = (
   finishedAt,
 });
 
+const createOutcomeReport = (
+  source: SourceDescriptor,
+  outputDir: string,
+  outcome: SourceSyncOutcome,
+  startedAt: Date,
+  finishedAt: Date,
+): SourceSyncReport => {
+  if (typeof outcome.message === 'string') {
+    return {
+      source,
+      status: outcome.status,
+      message: outcome.message,
+      outputDir,
+      startedAt,
+      finishedAt,
+    };
+  }
+
+  return {
+    source,
+    status: outcome.status,
+    outputDir,
+    startedAt,
+    finishedAt,
+  };
+};
+
 const syncSource = async (
   source: SourceDescriptor,
   outputRoot: string,
@@ -122,15 +149,7 @@ const syncSource = async (
   }
 
   const finishedAt = new Date();
-
-  return {
-    source,
-    status: outcome.status,
-    message: outcome.message,
-    outputDir,
-    startedAt,
-    finishedAt,
-  };
+  return createOutcomeReport(source, outputDir, outcome, startedAt, finishedAt);
 };
 
 const createSummary = (
@@ -160,7 +179,7 @@ const createSummary = (
  */
 export const syncSources = async (options: SourceSyncOptions): Promise<SourceSyncResult> => {
   const registry = options.registry ?? createSourceRegistry();
-  const adapters = options.adapters ?? createSourceAdapterRegistry();
+  const adapters = options.adapters ?? createDefaultSourceAdapterRegistry();
   const sources = selectSources(registry, options.sourceIds);
   const startedAt = new Date();
 
