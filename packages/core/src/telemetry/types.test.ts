@@ -4,11 +4,13 @@ import type { Message, ScenarioConfig } from '../scenario/types.js';
 import type { TelemetryEvent, TelemetryEventType, TelemetryProvider } from './types.js';
 
 class TestTelemetryProvider implements TelemetryProvider {
-  async configure(_scenario: ScenarioConfig): Promise<void> {
-    // No-op for test provider.
+  configure(_scenario: ScenarioConfig): Promise<void> {
+    return Promise.resolve();
   }
 
   async *execute(_messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
+    // Keeps the test provider aligned with async generator behavior.
+    await Promise.resolve();
     yield {
       timestamp: new Date(0),
       type: 'llm_output',
@@ -18,8 +20,8 @@ class TestTelemetryProvider implements TelemetryProvider {
     };
   }
 
-  async teardown(): Promise<void> {
-    // No-op for test provider.
+  teardown(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
