@@ -84,11 +84,11 @@ describe('Scenario types', () => {
     };
 
     const [firstAttack] = scenario.attack;
-    if (!firstAttack) {
+    if (firstAttack) {
+      expect(firstAttack.role).toBe('user');
+      expect(scenario.metadata.severity).toBe('high');
+    } else {
       throw new Error('Expected at least one attack message.');
     }
-
-    expect(firstAttack.role).toBe('user');
-    expect(scenario.metadata.severity).toBe('high');
   });
 });

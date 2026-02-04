@@ -47,11 +47,11 @@ describe('Telemetry types', () => {
     }
 
     const [firstEvent] = events;
-    if (!firstEvent) {
+    if (firstEvent) {
+      expect(firstEvent.type).toBe('llm_output');
+      expect(firstEvent.payload).toMatchObject({ content: 'ok' });
+    } else {
       throw new Error('Expected at least one telemetry event.');
     }
-
-    expect(firstEvent.type).toBe('llm_output');
-    expect(firstEvent.payload).toMatchObject({ content: 'ok' });
   });
 });
