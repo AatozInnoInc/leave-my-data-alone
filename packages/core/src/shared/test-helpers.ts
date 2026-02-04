@@ -9,17 +9,17 @@ export interface ScenarioYamlBuilderOptions {
   description?: string;
   severity?: string;
   attackClass?: string;
-  tags?: string[];
-  toolsEnabled?: string[];
-  toolsRequireConfirmation?: string[];
+  tags?: readonly string[];
+  toolsEnabled?: readonly string[];
+  toolsRequireConfirmation?: readonly string[];
   memory?: boolean;
-  retrieval?: Array<{ type: string; fixture: string }>;
-  canaries?: Array<{ id: string; value: string }>;
-  workspace?: Array<{ source: string; target: string }>;
-  attack?: Array<{ role: string; content: string }>;
-  invariantsMustNotContain?: Array<{ pattern: string }>;
-  invariantsMustNotCall?: Array<{ tool: string; args: Record<string, unknown> }>;
-  invariantsMustNotEncode?: Array<{ type: string; of: string[] }>;
+  retrieval?: readonly { type: string; fixture: string }[];
+  canaries?: readonly { id: string; value: string }[];
+  workspace?: readonly { source: string; target: string }[];
+  attack?: readonly { role: string; content: string }[];
+  invariantsMustNotContain?: readonly { pattern: string }[];
+  invariantsMustNotCall?: readonly { tool: string; args: Record<string, unknown> }[];
+  invariantsMustNotEncode?: readonly { type: string; of: readonly string[] }[];
 }
 
 /**
@@ -71,17 +71,17 @@ export class ScenarioYamlBuilder {
     return this;
   }
 
-  public withTags(tags: string[]): this {
+  public withTags(tags: readonly string[]): this {
     this.options.tags = tags;
     return this;
   }
 
-  public withToolsEnabled(tools: string[]): this {
+  public withToolsEnabled(tools: readonly string[]): this {
     this.options.toolsEnabled = tools;
     return this;
   }
 
-  public withToolsRequireConfirmation(tools: string[]): this {
+  public withToolsRequireConfirmation(tools: readonly string[]): this {
     this.options.toolsRequireConfirmation = tools;
     return this;
   }
@@ -91,37 +91,41 @@ export class ScenarioYamlBuilder {
     return this;
   }
 
-  public withRetrieval(retrieval: Array<{ type: string; fixture: string }>): this {
+  public withRetrieval(retrieval: readonly { type: string; fixture: string }[]): this {
     this.options.retrieval = retrieval;
     return this;
   }
 
-  public withCanaries(canaries: Array<{ id: string; value: string }>): this {
+  public withCanaries(canaries: readonly { id: string; value: string }[]): this {
     this.options.canaries = canaries;
     return this;
   }
 
-  public withWorkspace(workspace: Array<{ source: string; target: string }>): this {
+  public withWorkspace(workspace: readonly { source: string; target: string }[]): this {
     this.options.workspace = workspace;
     return this;
   }
 
-  public withAttack(attack: Array<{ role: string; content: string }>): this {
+  public withAttack(attack: readonly { role: string; content: string }[]): this {
     this.options.attack = attack;
     return this;
   }
 
-  public withMustNotContain(patterns: Array<{ pattern: string }>): this {
+  public withMustNotContain(patterns: readonly { pattern: string }[]): this {
     this.options.invariantsMustNotContain = patterns;
     return this;
   }
 
-  public withMustNotCall(calls: Array<{ tool: string; args: Record<string, unknown> }>): this {
+  public withMustNotCall(
+    calls: readonly { tool: string; args: Record<string, unknown> }[],
+  ): this {
     this.options.invariantsMustNotCall = calls;
     return this;
   }
 
-  public withMustNotEncode(encodings: Array<{ type: string; of: string[] }>): this {
+  public withMustNotEncode(
+    encodings: readonly { type: string; of: readonly string[] }[],
+  ): this {
     this.options.invariantsMustNotEncode = encodings;
     return this;
   }
