@@ -13,7 +13,9 @@ describe('createSourceRegistry', () => {
   it('should look up a source by id', (): void => {
     const registry = createSourceRegistry();
     const source = registry.getById('jailbreakbench');
+    const jailbreakLlms = registry.getById('jailbreak_llms');
 
     expect(source?.id).toBe('jailbreakbench');
+    expect(jailbreakLlms?.id).toBe('jailbreak_llms');
   });
 });
