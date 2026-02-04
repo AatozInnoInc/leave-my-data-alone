@@ -4,21 +4,15 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { createScenarioYaml, InvalidYamlFixtures } from '../../shared/test-helpers.js';
 import { createListCommand, listScenarioDirectory } from './list.js';
 
-const scenarioYaml = (id: string): string => `
-metadata:
-  id: "${id}"
-  name: "Scenario ${id}"
-  severity: low
-  attack_class: list
-agent_config:
-  tools:
-    enabled: []
-  memory: false
-attack: []
-invariants: {}
-`;
+const scenarioYaml = (id: string): string =>
+  createScenarioYaml()
+    .withId(id)
+    .withName(`Scenario ${id}`)
+    .withAttackClass('list')
+    .build();
 
 describe('listScenarioDirectory', () => {
   it('should list scenarios from nested directories', async (): Promise<void> => {
@@ -45,7 +39,11 @@ describe('listScenarioDirectory', () => {
     const tempDir = await mkdtemp(join(tmpdir(), 'lmda-list-'));
 
     try {
-      await writeFile(join(tempDir, 'invalid.yaml'), 'invalid: [', 'utf8');
+      await writeFile(
+        join(tempDir, 'invalid.yaml'),
+        InvalidYamlFixtures.unclosedArray(),
+        'utf8',
+      );
 
       const result = await listScenarioDirectory(tempDir);
 

@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { ScenarioConfig } from '../../scenario/types.js';
+import { createScenarioYaml } from '../../shared/test-helpers.js';
 import type { TelemetryEvent, TelemetryProvider } from '../../telemetry/types.js';
 import {
   createRunCommand,
@@ -13,23 +14,14 @@ import {
   type ProviderFactory,
 } from './run.js';
 
-const scenarioYaml = (): string => `
-metadata:
-  id: "run-test"
-  name: "Run test scenario"
-  severity: low
-  attack_class: run
-agent_config:
-  tools:
-    enabled: []
-  memory: false
-attack:
-  - role: user
-    content: "Hello"
-invariants:
-  must_not_contain:
-    - pattern: "CANARY"
-`;
+const buildRunScenarioYaml = (): string =>
+  createScenarioYaml()
+    .withId('run-test')
+    .withName('Run test scenario')
+    .withAttackClass('run')
+    .withAttack([{ role: 'user', content: 'Hello' }])
+    .withMustNotContain([{ pattern: 'CANARY' }])
+    .build();
 
 class StubProvider implements TelemetryProvider {
   public async configure(_scenario: ScenarioConfig): Promise<void> {
@@ -55,7 +47,7 @@ describe('runScenario', () => {
     const scenarioPath = join(tempDir, 'scenario.yaml');
 
     try {
-      await writeFile(scenarioPath, scenarioYaml(), 'utf8');
+      await writeFile(scenarioPath, buildRunScenarioYaml(), 'utf8');
 
       const providerFactory: ProviderFactory = async () => new StubProvider();
       const result = await runScenario({
