@@ -22,7 +22,7 @@ describe('OpenClawProvider', () => {
     });
 
     // Act
-    const iterator = provider.execute([]);
+    const iterator = provider.execute([{ role: 'system', content: 'system-only' }]);
 
     // Assert
     await expect(iterator.next()).rejects.toBeInstanceOf(OpenClawProviderError);
