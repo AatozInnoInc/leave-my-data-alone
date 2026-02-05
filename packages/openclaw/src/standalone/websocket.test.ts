@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createWebSocketClient, OpenClawWebSocketError } from './websocket.js';
+import { createWebSocketClient, MAX_PAYLOAD_BYTES, OpenClawWebSocketError } from './websocket.js';
 
 type MockSocketHandlers = Record<string, Array<(...args: unknown[]) => void>>;
 
@@ -100,5 +100,32 @@ describe('createWebSocketClient', () => {
 
     // Assert
     expect(action).toThrow(OpenClawWebSocketError);
+  });
+
+  it('passes maxPayload to WebSocket constructor', () => {
+    createWebSocketClient('ws://example.com');
+    const socket = getLastSocket();
+    expect(socket.options).toMatchObject({ maxPayload: MAX_PAYLOAD_BYTES });
+  });
+
+  it('stringifies ArrayBuffer message as utf8', () => {
+    const client = createWebSocketClient('ws://example.com');
+    const socket = getLastSocket();
+    const messageHandler = vi.fn();
+    client.onMessage(messageHandler);
+    const buf = new ArrayBuffer(4);
+    new Uint8Array(buf).set([0x68, 0x69, 0x21, 0x21]); // "hi!!"
+    socket.emit('message', buf);
+    expect(messageHandler).toHaveBeenCalledWith('hi!!');
+  });
+
+  it('stringifies ArrayBuffer.isView (TypedArray) message as utf8', () => {
+    const client = createWebSocketClient('ws://example.com');
+    const socket = getLastSocket();
+    const messageHandler = vi.fn();
+    client.onMessage(messageHandler);
+    const view = new Uint8Array([0x6f, 0x6b]); // "ok"
+    socket.emit('message', view);
+    expect(messageHandler).toHaveBeenCalledWith('ok');
   });
 });
