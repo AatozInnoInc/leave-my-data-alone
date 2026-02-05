@@ -5,7 +5,7 @@
     "paths": {
       "@lmda/core": ["../core/src/index.ts"]
     },
-    "rootDir": ".",
+    "rootDir": "..",
     "outDir": "dist",
     "noEmit": true,
     "types": ["node", "vitest/globals"]
