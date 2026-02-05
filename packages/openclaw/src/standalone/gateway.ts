@@ -207,6 +207,9 @@ const createTelemetryEvent = (
   payload,
 });
 
+/** Maximum number of queued agent events; prevents unbounded growth when consumer is slow. */
+const MAX_EVENT_QUEUE_SIZE = 50_000;
+
 class AsyncQueue<T> implements AsyncIterable<T> {
   private readonly items: T[] = [];
   private readonly waiters: Array<(result: IteratorResult<T>) => void> = [];
@@ -214,12 +217,17 @@ class AsyncQueue<T> implements AsyncIterable<T> {
 
   public push(value: T): void {
     if (this.closed) {
+      console.warn('[OpenClaw] Dropped agent event: event queue is already closed.');
       return;
     }
     const waiter = this.waiters.shift();
     if (waiter) {
       waiter({ value, done: false });
       return;
+    }
+    if (this.items.length >= MAX_EVENT_QUEUE_SIZE) {
+      this.items.shift();
+      console.warn('[OpenClaw] Event queue at capacity; dropped oldest event.');
     }
     this.items.push(value);
   }
@@ -356,9 +364,13 @@ class OpenClawGatewayClient {
     void this.request('connect', params)
       .then(() => {
         this.connectResolve?.();
+        this.connectResolve = null;
+        this.connectReject = null;
       })
       .catch((error) => {
         this.connectReject?.(normalizeError(error));
+        this.connectResolve = null;
+        this.connectReject = null;
       });
   }
 
@@ -388,7 +400,9 @@ class OpenClawGatewayClient {
     }
 
     if (frame.type === 'event') {
+      // Challenge can be sent at handshake or later (e.g. re-auth). Reset so sendConnect runs again.
       if (frame.event === 'connect.challenge') {
+        this.connectSent = false;
         this.sendConnect();
         return;
       }
@@ -430,11 +444,19 @@ class OpenClawGatewayClient {
     const message = `OpenClaw gateway closed (${String(code)}): ${reason}`;
     this.eventQueue.close();
     this.flushPendingErrors(new Error(message));
-    this.connectReject?.(new Error(message));
+    if (this.connectReject) {
+      this.connectReject(new Error(message));
+      this.connectResolve = null;
+      this.connectReject = null;
+    }
   }
 
   private handleError(error: Error): void {
-    this.connectReject?.(error);
+    if (this.connectReject) {
+      this.connectReject(error);
+      this.connectResolve = null;
+      this.connectReject = null;
+    }
   }
 
   private flushPendingErrors(error: Error): void {
@@ -608,7 +630,14 @@ export class StandaloneGateway implements OpenClawAdapter {
           });
         }
 
-        await responsePromise;
+        try {
+          await responsePromise;
+        } catch (responseError) {
+          // Prefer lifecycle runError over server response rejection so the more descriptive error surfaces.
+          if (!runError) {
+            throw responseError;
+          }
+        }
 
         if (runError) {
           throw runError;
