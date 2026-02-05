@@ -44,4 +44,30 @@ describe('parseSessionLine', () => {
     // Assert
     expect(event).toBeNull();
   });
+
+  it('should parse numeric timestamp (ms since epoch)', () => {
+    const line = JSON.stringify({
+      timestamp: 1706000000000,
+      type: 'llm_output',
+      payload: {},
+    });
+    const event = parseSessionLine(line);
+    expect(event).not.toBeNull();
+    expect(event!.timestamp.getTime()).toBe(1706000000000);
+  });
+
+  it('should return null for empty string lines', () => {
+    expect(parseSessionLine('')).toBeNull();
+    expect(parseSessionLine('   ')).toBeNull();
+  });
+
+  it('should parse ISO timestamp string', () => {
+    const line = JSON.stringify({
+      timestamp: '1970-01-01T00:00:00.000Z',
+      type: 'llm_output',
+      payload: { content: 'ok' },
+    });
+    const event = parseSessionLine(line);
+    expect(event?.timestamp.getTime()).toBe(0);
+  });
 });
