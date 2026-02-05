@@ -2,6 +2,8 @@
 
 import type { TelemetryEvent, TelemetryEventType } from '@lmda/core';
 
+import { isRecord } from '../shared/type-guards.js';
+
 const TELEMETRY_EVENT_TYPES: readonly TelemetryEventType[] = [
   'tool_call_start',
   'tool_call_end',
@@ -13,9 +15,6 @@ const TELEMETRY_EVENT_TYPES: readonly TelemetryEventType[] = [
   'user_confirmation_requested',
   'user_confirmation_response',
 ];
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const isTelemetryEventType = (value: string): value is TelemetryEventType =>
   TELEMETRY_EVENT_TYPES.includes(value as TelemetryEventType);

@@ -2,6 +2,8 @@
 
 import { WebSocket } from 'ws';
 
+import { isRecord, normalizeError } from '../shared/type-guards.js';
+
 export interface OpenClawWebSocketClient {
   readonly url: string;
   readonly readyState: number;
@@ -24,9 +26,6 @@ export class OpenClawWebSocketError extends Error {
 }
 
 const MAX_PAYLOAD_BYTES = 25 * 1024 * 1024;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;
 
 const stringifySocketData = (data: unknown): string => {
   if (typeof data === 'string') {
@@ -54,9 +53,6 @@ const stringifySocketData = (data: unknown): string => {
 
   return String(data);
 };
-
-const normalizeSocketError = (error: unknown): Error =>
-  error instanceof Error ? error : new Error(String(error));
 
 class OpenClawWsClient implements OpenClawWebSocketClient {
   public readonly url: string;
@@ -89,7 +85,7 @@ class OpenClawWsClient implements OpenClawWebSocketClient {
 
   public onError(handler: (error: Error) => void): void {
     this.socket.on('error', (error: unknown) => {
-      handler(normalizeSocketError(error));
+      handler(normalizeError(error));
     });
   }
 
@@ -118,7 +114,7 @@ export const createWebSocketClient = (url: string): OpenClawWebSocketClient => {
     throw new OpenClawWebSocketError(
       normalizedUrl,
       'Failed to create a WebSocket connection for the OpenClaw gateway.',
-      { cause: normalizeSocketError(error) },
+      { cause: normalizeError(error) },
     );
   }
 };
