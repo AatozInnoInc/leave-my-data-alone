@@ -25,7 +25,7 @@ export class OpenClawWebSocketError extends Error {
   }
 }
 
-const MAX_PAYLOAD_BYTES = 25 * 1024 * 1024;
+export const MAX_PAYLOAD_BYTES = 25 * 1024 * 1024;
 
 const stringifySocketData = (data: unknown): string => {
   if (typeof data === 'string') {
@@ -41,10 +41,16 @@ const stringifySocketData = (data: unknown): string => {
   }
 
   if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return '';
+    }
     const buffers = data.filter((entry): entry is Buffer => Buffer.isBuffer(entry));
-    if (buffers.length > 0) {
+    if (buffers.length === data.length) {
       return Buffer.concat(buffers).toString('utf8');
     }
+    // Chunked message with non-Buffer entries; avoid producing "[object Object]".
+    console.warn('[OpenClaw] WebSocket message array contained non-Buffer entries; treating as unexpected.');
+    return String(data);
   }
 
   if (isRecord(data) && typeof data.toString === 'function') {
