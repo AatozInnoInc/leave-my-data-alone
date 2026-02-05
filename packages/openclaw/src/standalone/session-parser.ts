@@ -31,7 +31,8 @@ const coerceTimestamp = (value: unknown): Date | null => {
     }
   }
 
-  // TODO_AGENT: This error should be handled explicitly.
+  // Invalid or missing timestamp; parseSessionLine will skip this line. Log so operators can detect bad data.
+  console.warn('[OpenClaw] Session line has invalid or missing timestamp; skipping.', { value });
   return null;
 };
 
