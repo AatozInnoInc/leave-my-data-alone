@@ -21,6 +21,7 @@ export const createOpenClawMiddleware = (collector: TelemetryCollector): OpenCla
 
 /**
  * Adapter that expects telemetry events from OpenClaw hooks.
+ * Plugin mode is push-based via createOpenClawMiddleware and handleEvent; execute() is not used and will throw.
  */
 export class PluginGateway implements OpenClawAdapter {
   constructor(_options: OpenClawProviderOptions) {}

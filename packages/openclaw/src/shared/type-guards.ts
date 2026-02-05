@@ -1,5 +1,9 @@
 // Shared type guards and coercions for standalone OpenClaw.
 
+/**
+ * True when value is a plain object (not null, array, or class instance).
+ * Note: Date and RegExp pass this guard. Safe for JSON.parsed payloads; use with care elsewhere.
+ */
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 

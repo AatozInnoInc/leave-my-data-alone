@@ -46,6 +46,7 @@ export class ScenarioEngine {
     const context = createScenarioContext({
       scenario,
       provider: this.provider,
+      // Conditional spread: when false, nothing is spread (valid TypeScript idiom for optional props).
       ...(this.evaluatorOverride !== undefined && { evaluator: this.evaluatorOverride }),
     });
 

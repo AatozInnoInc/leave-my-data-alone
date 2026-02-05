@@ -1,4 +1,4 @@
-// Moltbot skill stub for LMDA.
+// OpenClaw skill stub for LMDA.
 
 export interface OpenClawSkill {
   readonly name: string;
