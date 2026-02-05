@@ -25,5 +25,7 @@ Prioritize and observe the following patterns below. Holistically, the codebase 
 - High-quality testing
 - Safeties
 - Null guarding
+- Domain Driven Design (DDD)
+- Functional approaches for critical areas
 - Exceptional memory management (where applicable) such as memory fencing
 - Avoid negative expressions. Check for true/positive checks intead of false/negative checks. Exception: allows for early exits.
