@@ -10,6 +10,7 @@ export interface OpenClawTelemetryEvent {
 
 /**
  * Maps an OpenClaw telemetry event into LMDA core telemetry.
+ * Currently a pass-through; this seam allows transformation when OpenClaw and core types diverge.
  */
 export const mapOpenClawTelemetryEvent = (event: OpenClawTelemetryEvent): TelemetryEvent => ({
   timestamp: event.timestamp,

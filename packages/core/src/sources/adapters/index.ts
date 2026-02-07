@@ -14,11 +14,14 @@ export interface DefaultAdapterOptions {
 /**
  * Creates a registry with the default Tier 1 adapters.
  */
+const adapterOptions = (fetcher: Fetcher | undefined) =>
+  fetcher !== undefined ? { fetcher } : {};
+
 export const createDefaultSourceAdapterRegistry = (
   options: DefaultAdapterOptions = {},
 ): SourceAdapterRegistry =>
   createSourceAdapterRegistry([
-    createJailbreakBenchAdapter({ fetcher: options.fetcher }),
-    createAwesomeJailbreakAdapter({ fetcher: options.fetcher }),
-    createJailbreakLlmsAdapter({ fetcher: options.fetcher }),
+    createJailbreakBenchAdapter(adapterOptions(options.fetcher)),
+    createAwesomeJailbreakAdapter(adapterOptions(options.fetcher)),
+    createJailbreakLlmsAdapter(adapterOptions(options.fetcher)),
   ]);

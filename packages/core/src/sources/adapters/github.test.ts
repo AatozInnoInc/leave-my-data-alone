@@ -16,7 +16,7 @@ const createFetcher = (ok: boolean, data: Uint8Array): Fetcher => async () => ({
   ok,
   status: ok ? 200 : 404,
   statusText: ok ? 'OK' : 'Not Found',
-  arrayBuffer: async () => data.buffer,
+  arrayBuffer: async (): Promise<ArrayBuffer> => data.buffer.slice(0) as ArrayBuffer,
 });
 
 describe('buildGitHubArchiveUrl', () => {

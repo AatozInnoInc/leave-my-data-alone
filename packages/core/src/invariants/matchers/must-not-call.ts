@@ -70,7 +70,10 @@ const getToolCallPayload = (
   const tool = typeof payload.tool === 'string' ? payload.tool : undefined;
   const args = payload.args;
 
-  return { tool, args };
+  return {
+    ...(tool !== undefined && { tool }),
+    ...(args !== undefined && { args }),
+  };
 };
 
 /**

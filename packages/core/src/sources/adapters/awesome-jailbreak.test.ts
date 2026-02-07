@@ -12,7 +12,7 @@ const createFetcher = (data: Uint8Array): Fetcher => async () => ({
   ok: true,
   status: 200,
   statusText: 'OK',
-  arrayBuffer: async () => data.buffer,
+  arrayBuffer: async (): Promise<ArrayBuffer> => data.buffer.slice(0) as ArrayBuffer,
 });
 
 describe('createAwesomeJailbreakAdapter', () => {

@@ -37,14 +37,17 @@ export class ScenarioEngine {
 
   constructor(options: ScenarioEngineOptions) {
     this.provider = options.provider;
-    this.evaluatorOverride = options.evaluator;
+    if (options.evaluator !== undefined) {
+      this.evaluatorOverride = options.evaluator;
+    }
   }
 
   public async run(scenario: ScenarioConfig): Promise<EvaluationResult> {
     const context = createScenarioContext({
       scenario,
       provider: this.provider,
-      evaluator: this.evaluatorOverride,
+      // Conditional spread: when false, nothing is spread (valid TypeScript idiom for optional props).
+      ...(this.evaluatorOverride !== undefined && { evaluator: this.evaluatorOverride }),
     });
 
     await this.configureScenario(context.provider, scenario);
