@@ -63,6 +63,17 @@ export interface RunScenarioResult {
   readonly output: ReporterOutput;
 }
 
+const REPORTER_FORMATS: readonly ReporterFormat[] = ['console', 'json', 'junit'];
+
+const isReporterFormat = (value: string): value is ReporterFormat =>
+  REPORTER_FORMATS.includes(value as ReporterFormat);
+
+/**
+ * Normalizes reporter inputs to the supported format list.
+ */
+const parseReporterFormat = (value: string): ReporterFormat | null =>
+  isReporterFormat(value) ? value : null;
+
 const createReporter = (format: ReporterFormat): Reporter => {
   if (format === 'json') {
     return new JsonReporter();
@@ -235,13 +246,21 @@ export const createRunCommand = (): Command => {
       }>();
 
       try {
+        const reporterFormat = parseReporterFormat(options.reporter);
+        if (reporterFormat === null) {
+          console.error(
+            `Unknown reporter format "${options.reporter}". Use console, json, or junit.`,
+          );
+          process.exitCode = 1;
+          return;
+        }
         const providerFactory = await loadProviderFactory(options.provider, options.providerExport);
         const providerConfig = await loadProviderConfig(options.providerConfig);
         const baseOptions: RunScenarioOptions = {
           scenarioPath,
           providerFactory,
           providerConfig,
-          reporterFormat: options.reporter,
+          reporterFormat,
         };
         const runOptions =
           options.output === undefined

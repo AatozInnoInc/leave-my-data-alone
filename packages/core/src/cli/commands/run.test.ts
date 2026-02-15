@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { Message, ScenarioConfig } from '../../scenario/types.js';
 import { createScenarioYaml } from '../../shared/test-helpers.js';
@@ -100,5 +100,47 @@ describe('createRunCommand', () => {
     const command = createRunCommand();
 
     expect(command.name()).toBe('run');
+  });
+
+  it('should reject invalid reporter formats', async (): Promise<void> => {
+    const tempDir = await mkdtemp(join(tmpdir(), 'lmda-cli-'));
+    const scenarioPath = join(tempDir, 'scenario.yaml');
+    const modulePath = join(tempDir, 'provider.mjs');
+    const moduleContents = `
+      export const createProvider = async () => ({
+        configure: async () => {},
+        execute: async function* () {},
+        teardown: async () => {},
+      });
+    `;
+
+    const originalExitCode = process.exitCode;
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      await writeFile(scenarioPath, buildRunScenarioYaml(), 'utf8');
+      await writeFile(modulePath, moduleContents, 'utf8');
+
+      process.exitCode = undefined;
+      const command = createRunCommand();
+      await command.parseAsync([
+        'node',
+        'lmda',
+        scenarioPath,
+        '--provider',
+        modulePath,
+        '--reporter',
+        'csv',
+      ]);
+
+      expect(process.exitCode).toBe(1);
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Unknown reporter format'),
+      );
+    } finally {
+      errorSpy.mockRestore();
+      process.exitCode = originalExitCode;
+      await rm(tempDir, { recursive: true, force: true });
+    }
   });
 });
