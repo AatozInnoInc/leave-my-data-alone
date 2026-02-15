@@ -1,6 +1,12 @@
 // Public API exports for @lmda/openclaw.
 
-export type { OpenClawAdapter, OpenClawProviderMode, OpenClawProviderOptions } from './provider.js';
+export type {
+  OpenClawAdapter,
+  OpenClawEventSink,
+  OpenClawPluginRunner,
+  OpenClawProviderMode,
+  OpenClawProviderOptions,
+} from './provider.js';
 export { OpenClawProvider, OpenClawProviderError } from './provider.js';
 
 export type { OpenClawMiddleware } from './plugin/middleware.js';

@@ -7,6 +7,15 @@ import { StandaloneGateway } from './standalone/gateway.js';
 
 export type OpenClawProviderMode = 'standalone' | 'plugin';
 
+export interface OpenClawEventSink {
+  handleEvent(event: TelemetryEvent): void;
+}
+
+export type OpenClawPluginRunner = (options: {
+  readonly messages: readonly Message[];
+  readonly eventSink: OpenClawEventSink;
+}) => Promise<void>;
+
 export interface OpenClawProviderOptions {
   /**
    * How to connect to OpenClaw.
@@ -38,6 +47,10 @@ export interface OpenClawProviderOptions {
    * Workspace root for scenario execution.
    */
   readonly workspaceRoot: string;
+  /**
+   * Plugin runner hook (plugin mode only).
+   */
+  readonly pluginRunner?: OpenClawPluginRunner;
 }
 
 export class OpenClawProviderError extends Error {
