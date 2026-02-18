@@ -41,6 +41,7 @@ export interface OpenClawProviderOptions {
   readonly sessionKey?: string;
   /**
    * Path to OpenClaw config (standalone mode only).
+   * Reserved for future use: config-driven gateway discovery.
    */
   readonly configPath?: string;
   /**
