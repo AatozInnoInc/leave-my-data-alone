@@ -32,10 +32,10 @@ const DEFAULT_SOURCES: readonly SourceDescriptor[] = [
     tier: 'tier1',
   },
   {
-    id: `jailbreak_llms`,
-    name: `Jailbreak LLMs`,
-    description: `In-the-wild jailbreak prompts on LLMs.`,
-    homepage: `https://github.com/verazuo/jailbreak_llms`,
+    id: 'jailbreak_llms',
+    name: 'Jailbreak LLMs',
+    description: 'In-the-wild jailbreak prompts on LLMs.',
+    homepage: 'https://github.com/verazuo/jailbreak_llms',
     tier: 'tier1',
   },
 ];

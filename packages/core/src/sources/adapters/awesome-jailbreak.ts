@@ -21,8 +21,8 @@ export const createAwesomeJailbreakAdapter = (
   sync: async ({ source, outputDir }): Promise<SourceSyncOutcome> => {
     const downloadOptions = {
       repo: {
-        owner: 'awesome-jailbreak',
-        repo: 'awesome-jailbreak-on-llms',
+        owner: 'yueliu1999',
+        repo: 'Awesome-Jailbreak-on-LLMs',
         ref: options.ref ?? DEFAULT_REF,
       },
       outputDir,
