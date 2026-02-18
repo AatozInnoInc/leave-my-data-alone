@@ -40,10 +40,10 @@ metadata:
     - exfiltration
 ```
 
-- **id** — Unique. Prefer `attack-class-variant-NNN`.
-- **severity** — Impact of a failure in production.
-- **attack_class** — Free-form category (e.g. indirect injection, exfil).
-- **tags** — For filtering runs.
+- **id**: Unique. Prefer `attack-class-variant-NNN`.
+- **severity**: Impact of a failure in production.
+- **attack_class**: Free-form category (e.g. indirect injection, exfil).
+- **tags**: For filtering runs.
 
 ## Agent Configuration
 
@@ -62,10 +62,10 @@ agent_config:
       fixture: fixtures/malicious-email.txt
 ```
 
-- **tools.enabled** — Tools available during the test.
-- **tools.require_confirmation** — Tools that must prompt for user consent.
-- **memory** — Whether the agent has persistent context.
-- **retrieval** — Content injected into context (RAG).
+- **tools.enabled**: Tools available during the test.
+- **tools.require_confirmation**: Tools that must prompt for user consent.
+- **memory**: Whether the agent has persistent context.
+- **retrieval**: Content injected into context (RAG).
 
 ## Fixtures
 
@@ -79,8 +79,8 @@ fixtures:
       target: ~/Documents/
 ```
 
-- **canaries** — Tokens that must never appear in agent output. Use high-entropy values.
-- **workspace** — Files placed in the agent workspace before the run.
+- **canaries**: Tokens that must never appear in agent output. Use high-entropy values.
+- **workspace**: Files placed in the agent workspace before the run.
 
 **Canary tips:** Unique high-entropy values per scenario; prefix with `CANARY_`; include at least 8 random hex chars, or use the API’s `generateCanary` to create them.
 
