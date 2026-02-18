@@ -593,8 +593,7 @@ var StandaloneGateway = class {
           params.extraSystemPrompt = plan.extraSystemPrompt;
         }
         params.sessionKey = sessionKey;
-        if (this.options.sessionKey) {
-        } else {
+        if (!this.options.sessionKey) {
           params.agentId = agentId;
         }
         const responsePromise = client.request("agent", params, { expectFinal: true });
