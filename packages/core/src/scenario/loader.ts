@@ -124,7 +124,7 @@ export const loadScenario = async (scenarioPath: string): Promise<ScenarioConfig
 
   let parsed: unknown;
   try {
-    parsed = parse(rawYaml);
+    parsed = parse(rawYaml, { maxAliasCount: 64 });
   } catch (error) {
     throw new ScenarioLoadError(scenarioPath, 'Failed to parse scenario YAML.', { cause: error });
   }
