@@ -41,9 +41,9 @@ sequenceDiagram
   LMDA->>Provider: teardown()
 ```
 
-- **configure** — Before each run: set up agent environment (workspace, tools, memory), sandbox, and framework connections.
-- **execute** — Send attack messages to the agent; yield telemetry events as they occur (async generator, real-time stream).
-- **teardown** — After each run: close connections, clean up temp resources, reset agent state.
+- **configure**: Before each run: set up agent environment (workspace, tools, memory), sandbox, and framework connections
+- **execute**: Send attack messages to the agent; yield telemetry events as they occur (async generator, real-time stream)
+- **teardown**: After each run: close connections, clean up temp resources, reset agent state
 
 ## TelemetryEvent Types
 
@@ -102,9 +102,9 @@ flowchart LR
   provider --> mapper
 ```
 
-- `src/index.ts` — Public exports
-- `src/provider.ts` — `TelemetryProvider` implementation
-- `src/telemetry/mapper.ts` — Framework events to `TelemetryEvent`
+- `src/index.ts`: Public exports
+- `src/provider.ts`: `TelemetryProvider` implementation
+- `src/telemetry/mapper.ts`: Framework events to `TelemetryEvent`
 
 ## Minimal Provider Example
 
@@ -135,5 +135,5 @@ export class MyProvider implements TelemetryProvider {
 
 ## Reference and Rules
 
-- **Reference:** `@lmda/openclaw` implements the full interface with standalone (WebSocket) and plugin (middleware) modes.
-- **Rules:** Do not change the `TelemetryProvider` interface without a design review. No `any`. Keep the provider independent of `@lmda/core` internals. Export only from `index.ts`. Follow `docs/CONTRIBUTING.md`.
+- **Reference:** `@lmda/openclaw` implements the full interface with standalone (WebSocket) and plugin (middleware) modes
+- **Rules:** Do not change the `TelemetryProvider` interface without a design review. No `any`. Keep the provider independent of `@lmda/core` internals. Export only from `index.ts`. Follow `docs/CONTRIBUTING.md`
