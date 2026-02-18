@@ -58,11 +58,17 @@ export class GitHubDownloadError extends Error {
 const DEFAULT_REF = 'main';
 
 /**
+ * Strips characters that are unsafe for filesystem paths and URLs.
+ */
+const sanitizeSegment = (value: string): string =>
+  value.replace(/[^a-zA-Z0-9._-]/g, '');
+
+/**
  * Builds the GitHub archive URL for a repository.
  */
 export const buildGitHubArchiveUrl = (repo: GitHubRepoReference): string => {
   const ref = repo.ref ?? DEFAULT_REF;
-  return `https://codeload.github.com/${repo.owner}/${repo.repo}/tar.gz/${ref}`;
+  return `https://codeload.github.com/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}/tar.gz/${encodeURIComponent(ref)}`;
 };
 
 const resolveFetcher = (fetcher: Fetcher | undefined): Fetcher => {
@@ -103,7 +109,8 @@ export const downloadGitHubArchive = async (
   const buffer = Buffer.from(await response.arrayBuffer());
   const ref = options.repo.ref ?? DEFAULT_REF;
   const filename =
-    options.filename ?? `${options.repo.owner}-${options.repo.repo}-${ref}.tar.gz`;
+    options.filename ??
+    `${sanitizeSegment(options.repo.owner)}-${sanitizeSegment(options.repo.repo)}-${sanitizeSegment(ref)}.tar.gz`;
   const archivePath = join(options.outputDir, filename);
 
   await writeFile(archivePath, buffer);
