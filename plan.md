@@ -60,7 +60,7 @@ Tasks:
 - GitHub Actions for daily source sync
 
 ### Phase 4: Review [PENDING]
-**Model**: Opus 4.5
+**Model**: Opus 4.6
 
 Tasks:
 - Architecture review
@@ -97,7 +97,7 @@ Tasks:
 
 | Model | Role | Strengths |
 |-------|------|-----------|
-| Opus 4.5 | Design, review | Big-picture thinking, conceptual integrity |
+| Opus 4.6 | Design, review | Big-picture thinking, conceptual integrity |
 | GPT-5.2 Codex | Implementation | Precise code generation, tests |
 | Sonnet 4.5 | Polish, glue | Fast turnaround |
 
@@ -105,5 +105,5 @@ Tasks:
 
 - All models must read docs/CONTRIBUTING.md before writing code
 - All handoffs must update HANDOFF.md
-- Design changes require Opus 4.5 approval
+- Design changes require Opus 4.6 approval
 - LMDA is a standalone tool: do not lock into Moltbot

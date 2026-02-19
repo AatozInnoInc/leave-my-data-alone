@@ -5,6 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsup",
     "lint": "eslint . --ext .ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
