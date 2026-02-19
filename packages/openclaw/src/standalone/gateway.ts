@@ -524,9 +524,7 @@ export class StandaloneGateway implements OpenClawAdapter {
         }
 
         params.sessionKey = sessionKey;
-        if (this.options.sessionKey) {
-          // Explicit session key provided by caller.
-        } else {
+        if (!this.options.sessionKey) {
           params.agentId = agentId;
         }
 
