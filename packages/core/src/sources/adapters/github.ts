@@ -99,10 +99,10 @@ export const downloadGitHubArchive = async (
     },
   });
 
-  if (response.ok === false) {
+  if (!response.ok) {
     throw new GitHubDownloadError(
       archiveUrl,
-      `Failed to download archive (${response.status} ${response.statusText}).`,
+      `Failed to download archive (${String(response.status)} ${response.statusText}).`,
     );
   }
 

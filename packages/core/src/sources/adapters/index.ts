@@ -14,7 +14,7 @@ export interface DefaultAdapterOptions {
 /**
  * Creates a registry with the default Tier 1 adapters.
  */
-const adapterOptions = (fetcher: Fetcher | undefined) =>
+const adapterOptions = (fetcher: Fetcher | undefined): { fetcher?: Fetcher } =>
   fetcher !== undefined ? { fetcher } : {};
 
 export const createDefaultSourceAdapterRegistry = (

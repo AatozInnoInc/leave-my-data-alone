@@ -26,7 +26,9 @@ describe('syncSources', () => {
       const adapters = createSourceAdapterRegistry([
         {
           id: 'example',
-          sync: async ({ outputDir }) => {
+          sync: async ({
+            outputDir,
+          }): Promise<{ status: 'success' }> => {
             await writeFile(join(outputDir, 'marker.txt'), 'ok', 'utf8');
             return { status: 'success' };
           },

@@ -5,15 +5,18 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { SourceDescriptor } from '../registry.js';
-import type { Fetcher } from './github.js';
+import type { Fetcher, FetchResponse } from './github.js';
 import { createJailbreakLlmsAdapter } from './jailbreak-llms.js';
 
-const createFetcher = (data: Uint8Array): Fetcher => async () => ({
-  ok: true,
-  status: 200,
-  statusText: 'OK',
-  arrayBuffer: async (): Promise<ArrayBuffer> => data.buffer.slice(0) as ArrayBuffer,
-});
+const createFetcher = (data: Uint8Array): Fetcher =>
+  (): Promise<FetchResponse> =>
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      arrayBuffer: (): Promise<ArrayBuffer> =>
+        Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
+    });
 
 describe('createJailbreakLlmsAdapter', () => {
   it('should sync the source and write a manifest', async (): Promise<void> => {

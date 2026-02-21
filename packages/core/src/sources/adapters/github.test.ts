@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import type { Fetcher } from './github.js';
+import type { Fetcher, FetchResponse } from './github.js';
 import {
   buildGitHubArchiveUrl,
   downloadGitHubArchive,
@@ -12,12 +12,15 @@ import {
   writeSourceManifest,
 } from './github.js';
 
-const createFetcher = (ok: boolean, data: Uint8Array): Fetcher => async () => ({
-  ok,
-  status: ok ? 200 : 404,
-  statusText: ok ? 'OK' : 'Not Found',
-  arrayBuffer: async (): Promise<ArrayBuffer> => data.buffer.slice(0) as ArrayBuffer,
-});
+const createFetcher = (ok: boolean, data: Uint8Array): Fetcher =>
+  (): Promise<FetchResponse> =>
+    Promise.resolve({
+      ok,
+      status: ok ? 200 : 404,
+      statusText: ok ? 'OK' : 'Not Found',
+      arrayBuffer: (): Promise<ArrayBuffer> =>
+        Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
+    });
 
 describe('buildGitHubArchiveUrl', () => {
   it('should build a default archive URL', (): void => {

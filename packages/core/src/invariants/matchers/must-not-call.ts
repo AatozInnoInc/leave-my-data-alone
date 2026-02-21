@@ -24,7 +24,9 @@ const matchArgument = (expected: ArgumentMatch, actual: unknown): boolean => {
       return false;
     }
 
-    return expected.every((entry, index) => matchArgument(entry, actual[index]));
+    return expected.every((entry: ArgumentMatch, index: number) =>
+      matchArgument(entry, actual[index]),
+    );
   }
 
   if (isPatternMatch(expected)) {
