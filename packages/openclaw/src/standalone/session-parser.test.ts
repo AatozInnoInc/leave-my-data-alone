@@ -53,6 +53,7 @@ describe('parseSessionLine', () => {
     });
     const event = parseSessionLine(line);
     expect(event).not.toBeNull();
+    // Assertion above ensures event is non-null; ?. satisfies no-non-null-assertion.
     expect(event?.timestamp.getTime()).toBe(1706000000000);
   });
 

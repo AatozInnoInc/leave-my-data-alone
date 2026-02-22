@@ -415,6 +415,7 @@ class OpenClawGatewayClient {
       return;
     }
 
+    // parseGatewayFrame returns only 'res' | 'event'; all 'event' branches return above, so frame is 'res' here.
     const pending = this.pending.get(frame.id);
     if (!pending) {
       return;
