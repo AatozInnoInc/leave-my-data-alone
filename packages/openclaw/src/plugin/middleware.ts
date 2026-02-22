@@ -163,11 +163,11 @@ export class PluginGateway implements OpenClawAdapter {
 
     await runPromise;
 
-    // runError is set in .catch(); type checker does not narrow after await.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- set in promise .catch()
-    if (runError !== null && runError !== undefined) {
+    // runError is set in .catch(); type checker narrows it to null after await.
+    const err = runError as Error | null;
+    if (err instanceof Error) {
       throw new OpenClawProviderError('plugin', 'Plugin gateway execution failed.', {
-        cause: runError,
+        cause: err,
       });
     }
   }
