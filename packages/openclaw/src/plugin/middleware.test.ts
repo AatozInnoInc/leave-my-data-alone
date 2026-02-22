@@ -67,7 +67,7 @@ describe('OpenClaw middleware', () => {
     const gateway = new PluginGateway({
       mode: 'plugin',
       workspaceRoot: '/tmp/lmda',
-      pluginRunner: async ({ eventSink }) => {
+      pluginRunner: async ({ eventSink }): Promise<void> => {
         eventSink.handleEvent(eventOne);
         await Promise.resolve();
         eventSink.handleEvent(eventTwo);

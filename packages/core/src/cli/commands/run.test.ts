@@ -53,7 +53,7 @@ describe('runScenario', () => {
     try {
       await writeFile(scenarioPath, buildRunScenarioYaml(), 'utf8');
 
-      const providerFactory: ProviderFactory = async () => new StubProvider();
+      const providerFactory: ProviderFactory = () => Promise.resolve(new StubProvider());
       const result = await runScenario({
         scenarioPath,
         providerFactory,
@@ -115,7 +115,9 @@ describe('createRunCommand', () => {
     `;
 
     const originalExitCode = process.exitCode;
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation((): void => {
+      /* noop for test */
+    });
 
     try {
       await writeFile(scenarioPath, buildRunScenarioYaml(), 'utf8');

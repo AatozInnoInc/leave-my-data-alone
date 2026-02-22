@@ -14,9 +14,9 @@ class TestWebSocketClient implements OpenClawWebSocketClient {
   public readyState = 0;
   public readonly sent: string[] = [];
   private readonly openHandlers: MockHandler[] = [];
-  private readonly messageHandlers: Array<(data: string) => void> = [];
-  private readonly closeHandlers: Array<(code: number, reason: string) => void> = [];
-  private readonly errorHandlers: Array<(error: Error) => void> = [];
+  private readonly messageHandlers: ((data: string) => void)[] = [];
+  private readonly closeHandlers: ((code: number, reason: string) => void)[] = [];
+  private readonly errorHandlers: ((error: Error) => void)[] = [];
 
   constructor(url: string) {
     this.url = url;
@@ -78,11 +78,11 @@ vi.mock('./websocket.js', () => ({
   },
 }));
 
-type SentFrame = {
+interface SentFrame {
   readonly id: string;
   readonly method: string;
   readonly params?: Record<string, unknown>;
-};
+}
 
 const parseSentFrame = (socket: TestWebSocketClient, index: number): SentFrame => {
   const raw = socket.sent[index];
@@ -280,12 +280,13 @@ describe('StandaloneGateway', () => {
 
     expect(events).toHaveLength(5);
     const [e0, e1, e2, e3, e4] = events;
-    expect(e0!.payload).toMatchObject({ tool: 'shell.exec' });
-    expect(e1!.payload).toMatchObject({ tool: 'shell.exec' });
-    expect(e2!.payload).toMatchObject({ content: 'he' });
-    expect(e3!.payload).toMatchObject({ content: 'llo' });
-    expect(e4!.payload).toMatchObject({ content: 'hello' });
-    expect(e4!.timestamp.getTime()).toBe(4);
+    // toHaveLength(5) above guarantees e0..e4 defined; ?. is defensive for lint.
+    expect(e0?.payload).toMatchObject({ tool: 'shell.exec' });
+    expect(e1?.payload).toMatchObject({ tool: 'shell.exec' });
+    expect(e2?.payload).toMatchObject({ content: 'he' });
+    expect(e3?.payload).toMatchObject({ content: 'llo' });
+    expect(e4?.payload).toMatchObject({ content: 'hello' });
+    expect(e4?.timestamp.getTime()).toBe(4);
   });
 
   it('rejects when WebSocket errors before handshake completes', async () => {
@@ -486,10 +487,11 @@ describe('StandaloneGateway', () => {
     const events = await eventsPromise;
     const llmOutputs = events.filter((e) => e.type === 'llm_output');
     expect(llmOutputs).toHaveLength(2);
+    // toHaveLength(2) guarantees indices 0 and 1 defined; ?. satisfies no-non-null-assertion.
     // Note: these are the mocked assistant `text` values from the `agent` events above, not an
     // echo of the input messages ("first" / "second").
-    expect(llmOutputs[0]!.payload).toMatchObject({ content: 'one' });
-    expect(llmOutputs[1]!.payload).toMatchObject({ content: 'two' });
+    expect(llmOutputs[0]?.payload).toMatchObject({ content: 'one' });
+    expect(llmOutputs[1]?.payload).toMatchObject({ content: 'two' });
   });
 
   it('teardown closes client and iterator rejects when pending', async () => {
@@ -533,7 +535,7 @@ describe('StandaloneGateway', () => {
     );
     // We intentionally do NOT emit the final response frame for the agent request.
     // teardown() should close the client and reject pending requests.
-    gateway.teardown();
+    void gateway.teardown();
 
     await expect(eventsPromise).rejects.toThrow();
   });

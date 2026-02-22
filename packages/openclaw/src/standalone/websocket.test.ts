@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createWebSocketClient, MAX_PAYLOAD_BYTES, OpenClawWebSocketError } from './websocket.js';
 
-type MockSocketHandlers = Record<string, Array<(...args: unknown[]) => void>>;
+type MockSocketHandlers = Record<string, ((...args: unknown[]) => void)[]>;
 
-type MockWebSocket = {
+interface MockWebSocket {
   readonly url: string;
   readonly options?: unknown;
   readyState: number;
@@ -13,7 +13,7 @@ type MockWebSocket = {
   readonly close: ReturnType<typeof vi.fn>;
   on(event: string, handler: (...args: unknown[]) => void): void;
   emit(event: string, ...args: unknown[]): void;
-};
+}
 
 let lastSocket: MockWebSocket | null = null;
 

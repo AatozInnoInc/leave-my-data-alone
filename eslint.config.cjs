@@ -1,16 +1,25 @@
 const js = require('@eslint/js');
 const tseslint = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
+const globals = require('globals');
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 module.exports = [
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      '**/tsup.config.ts',
+      '**/vitest.config.ts',
+    ],
   },
   js.configs.recommended,
   {
     files: ['**/*.ts'],
+    ignores: ['**/*.config.ts'],
     languageOptions: {
+      globals: { ...globals.node },
       parser: tsParser,
       parserOptions: {
         project: [
@@ -36,5 +45,21 @@ module.exports = [
       '@typescript-eslint/prefer-readonly': 'error',
     },
   },
+  // Separate config for .config.ts files (without type checking)
+  {
+    files: ['**/*.config.ts'],
+    languageOptions: {
+      globals: globals.node,
+      parser: tsParser,
+      parserOptions: {
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
 ];
-

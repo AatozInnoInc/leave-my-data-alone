@@ -11,7 +11,7 @@ import type {
 import { OpenClawProviderError } from '../provider.js';
 import { normalizeError } from '../shared/type-guards.js';
 
-export interface OpenClawMiddleware extends OpenClawEventSink {}
+export type OpenClawMiddleware = OpenClawEventSink;
 
 type OpenClawMiddlewareTarget = TelemetryCollector | OpenClawEventSink;
 
@@ -25,7 +25,7 @@ const hasHandleEvent = (target: OpenClawMiddlewareTarget): target is OpenClawEve
 export const createOpenClawMiddleware = (
   target: OpenClawMiddlewareTarget,
 ): OpenClawMiddleware => ({
-  handleEvent: (event: TelemetryEvent) => {
+  handleEvent: (event: TelemetryEvent): void => {
     if (hasHandleEvent(target)) {
       target.handleEvent(event);
       return;
@@ -50,7 +50,7 @@ export const createOpenClawMiddleware = (
  */
 class AsyncQueue<T> implements AsyncIterable<T> {
   private readonly items: T[] = [];
-  private readonly waiters: Array<(result: IteratorResult<T>) => void> = [];
+  private readonly waiters: ((result: IteratorResult<T>) => void)[] = [];
   private closed = false;
 
   public push(value: T): void {
@@ -148,7 +148,7 @@ export class PluginGateway implements OpenClawAdapter {
 
     const runPromise = Promise.resolve()
       .then(() => runner({ messages, eventSink }))
-      .catch((error) => {
+      .catch((error: unknown) => {
         runError = normalizeError(error);
       })
       .finally(() => {
@@ -163,9 +163,11 @@ export class PluginGateway implements OpenClawAdapter {
 
     await runPromise;
 
-    if (runError) {
+    // runError is set in .catch(); type checker narrows it to null after await.
+    const err = runError as Error | null;
+    if (err instanceof Error) {
       throw new OpenClawProviderError('plugin', 'Plugin gateway execution failed.', {
-        cause: runError,
+        cause: err,
       });
     }
   }
