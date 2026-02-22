@@ -227,3 +227,7 @@ pnpm build
 ## License
 
 MIT
+
+## Sponsoring
+
+If my work has helped you in any way and you wish to express gratitude, it would mean more than I can express if you chose to <a href="https://github.com/sponsors/AatozInnoInc">sponsor my work</a>.
