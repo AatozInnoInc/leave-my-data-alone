@@ -5,7 +5,7 @@ Multi-model development with clear handoffs. Each model has a defined role.
 ## v1 Roadmap
 
 ### Phase 1: Design [COMPLETE]
-**Model**: Opus 4.5
+**Model**: Opus 4.6
 
 Deliverables:
 - [x] docs/ARCHITECTURE.md: System design and component interfaces
@@ -22,51 +22,41 @@ Key Decisions:
 - UI/UX: CLI plus Moltbot skill (v1), Web dashboard (v2)
 - External sources: Daily auto-sync from Tier 1 repos
 
-### Phase 2: Implementation [PENDING]
-**Model**: GPT-5.2 Codex Extra High
+### Phase 2: Implementation [COMPLETE]
+**Model**: GPT-5.3 Codex Extra High
 
 Tasks:
-1. Project scaffolding
-   - pnpm workspace setup
-   - Package structure for @lmda/core and @lmda/openclaw
-   - TypeScript, ESLint, Prettier, Vitest configuration
-2. @lmda/core implementation
-   - Scenario schema and loader
-   - Telemetry types and provider interface
-   - Canary generator (non-deterministic seeds)
-   - Invariant evaluator with matchers
-   - Fixture provisioner
-   - Scenario engine
-   - Reporters (JUnit, JSON, console)
-   - CLI (run, validate, list, sync, sources)
-3. @lmda/openclaw implementation
-   - Standalone mode (WebSocket plus JSONL)
-   - Plugin mode (middleware)
-   - Moltbot skill
-4. External source adapters
-   - JailbreakBench
-   - AI-Prompt-Injection-List
-   - Awesome-Jailbreak-on-LLMs
+- [x] Project scaffolding (pnpm workspace, TypeScript, ESLint, Prettier, Vitest)
+- [x] @lmda/core (schema, loader, engine, invariants, canary, fixtures, telemetry, reporters, CLI)
+- [x] @lmda/openclaw (standalone WebSocket, plugin middleware, Moltbot skill)
+- [x] External source adapters (JailbreakBench, Awesome-Jailbreak, Jailbreak LLMs)
 
-### Phase 3: Polish [PENDING]
-**Model**: Sonnet 4.5
+### Phase 3: Polish [COMPLETE]
+**Model**: Sonnet 4.6
 
 Tasks:
-- Bug fixes
-- Documentation polish
-- Built-in scenarios (finished tests)
-- Templates for user scenarios
-- CI workflow setup
-- GitHub Actions for daily source sync
+- [x] Bug fixes
+- [x] Documentation polish
 
-### Phase 4: Review [PENDING]
+Completed during Phase 4 review (gaps caught by Opus 4.6):
+- [x] Built-in scenarios (5 across indirect-injection, tool-coercion, session-leakage, encoding-exfil, smoke)
+- [x] Templates for user scenarios (3 templates plus README)
+- [x] CI workflow setup (.github/workflows/ci.yaml)
+- [x] GitHub Actions for daily source sync (.github/workflows/sync-sources.yaml)
+- [x] Build tooling (tsup for both packages)
+- [x] docs/SCENARIO-AUTHORING.md and docs/PROVIDER-GUIDE.md
+
+### Phase 4: Review [COMPLETE]
 **Model**: Opus 4.6
 
 Tasks:
-- Architecture review
-- Code review for conceptual integrity
-- Security review
-- Final documentation review
+- [x] Architecture review: all interfaces match spec
+- [x] Code review for conceptual integrity: 123 tests pass, no `any`, good SOLID compliance
+- [x] Security review: YAML bomb protection added, GitHub adapter input sanitization added, adapter owner mismatch fixed
+- [x] Final documentation review: missing docs created, PROVIDER-GUIDE condensed with Mermaid diagrams
+
+Remaining (deferred):
+- [ ] ESLint config fix (Node.js globals) and 78 lint errors (hand off to cheaper model)
 
 ## v2 Roadmap
 
@@ -98,8 +88,8 @@ Tasks:
 | Model | Role | Strengths |
 |-------|------|-----------|
 | Opus 4.6 | Design, review | Big-picture thinking, conceptual integrity |
-| GPT-5.2 Codex | Implementation | Precise code generation, tests |
-| Sonnet 4.5 | Polish, glue | Fast turnaround |
+| GPT-5.3 Codex | Implementation | Precise code generation, tests |
+| Sonnet 4.6 | Polish, glue | Fast turnaround |
 
 ## Rules
 
