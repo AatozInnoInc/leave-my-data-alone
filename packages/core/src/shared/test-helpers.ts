@@ -28,6 +28,7 @@ export interface ScenarioYamlBuilderOptions {
  */
 export class ScenarioYamlBuilder {
   private readonly options: Required<ScenarioYamlBuilderOptions> = {
+  private readonly options: Required<ScenarioYamlBuilderOptions> = {
     id: 'test-scenario',
     name: 'Test Scenario',
     description: '',
@@ -175,6 +176,7 @@ export class ScenarioYamlBuilder {
       });
     }
 
+    parts.push(`  memory: ${String(this.options.memory)}`);
     parts.push(`  memory: ${this.options.memory ? 'true' : 'false'}`);
 
     if (this.options.retrieval.length > 0) {
@@ -243,8 +245,10 @@ export class ScenarioYamlBuilder {
               parts.push(`        ${key}:`);
               Object.entries(value).forEach(([k, v]) => {
                 parts.push(`          ${k}: "${String(v)}"`);
+                parts.push(`          ${k}: "${String(v)}"`);
               });
             } else {
+              parts.push(`        ${key}: ${String(value)}`);
               parts.push(`        ${key}: ${String(value)}`);
             }
           });
@@ -256,7 +260,7 @@ export class ScenarioYamlBuilder {
         this.options.invariantsMustNotEncode.forEach((inv) => {
           parts.push(`    - type: ${inv.type}`);
           parts.push('      of:');
-          inv.of.forEach((val) => {
+          inv.of.forEach((val: string) => {
             parts.push(`        - ${val}`);
           });
         });

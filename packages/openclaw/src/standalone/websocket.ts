@@ -2,7 +2,7 @@
 
 import { WebSocket } from 'ws';
 
-import { isRecord, normalizeError } from '../shared/type-guards.js';
+import { normalizeError } from '../shared/type-guards.js';
 
 export interface OpenClawWebSocketClient {
   readonly url: string;

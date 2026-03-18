@@ -99,6 +99,7 @@ export const downloadGitHubArchive = async (
     },
   });
 
+  // Early throw; negative check allowed per style guide.
   if (!response.ok) {
     throw new GitHubDownloadError(
       archiveUrl,

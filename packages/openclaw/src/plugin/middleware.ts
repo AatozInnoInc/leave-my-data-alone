@@ -12,6 +12,7 @@ import { OpenClawProviderError } from '../provider.js';
 import { normalizeError } from '../shared/type-guards.js';
 
 export type OpenClawMiddleware = OpenClawEventSink;
+export type OpenClawMiddleware = OpenClawEventSink;
 
 type OpenClawMiddlewareTarget = TelemetryCollector | OpenClawEventSink;
 
@@ -25,6 +26,7 @@ const hasHandleEvent = (target: OpenClawMiddlewareTarget): target is OpenClawEve
 export const createOpenClawMiddleware = (
   target: OpenClawMiddlewareTarget,
 ): OpenClawMiddleware => ({
+  handleEvent: (event: TelemetryEvent): void => {
   handleEvent: (event: TelemetryEvent): void => {
     if (hasHandleEvent(target)) {
       target.handleEvent(event);
@@ -50,6 +52,7 @@ export const createOpenClawMiddleware = (
  */
 class AsyncQueue<T> implements AsyncIterable<T> {
   private readonly items: T[] = [];
+  private readonly waiters: ((result: IteratorResult<T>) => void)[] = [];
   private readonly waiters: ((result: IteratorResult<T>) => void)[] = [];
   private closed = false;
 
@@ -162,7 +165,7 @@ export class PluginGateway implements OpenClawAdapter {
     const runError = await runPromise;
     if (runError !== null) {
       throw new OpenClawProviderError('plugin', 'Plugin gateway execution failed.', {
-        cause: runError,
+        cause: err,
       });
     }
   }

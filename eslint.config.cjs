@@ -19,6 +19,7 @@ module.exports = [
   {
     files: ['**/src/**/*.ts'],
     languageOptions: {
+      globals: { ...globals.node },
       parser: tsParser,
       parserOptions: {
         project: [
@@ -45,5 +46,21 @@ module.exports = [
       '@typescript-eslint/prefer-readonly': 'error',
     },
   },
+  // Separate config for .config.ts files (without type checking)
+  {
+    files: ['**/*.config.ts'],
+    languageOptions: {
+      globals: globals.node,
+      parser: tsParser,
+      parserOptions: {
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
 ];
-

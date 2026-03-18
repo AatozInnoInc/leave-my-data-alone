@@ -17,4 +17,8 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/prefer-readonly': 'error',
   },
+  env: {
+    "node": true,
+    "es2022": true,
+  }
 };

@@ -5,9 +5,18 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { SourceDescriptor } from '../registry.js';
-import type { Fetcher } from './github.js';
+import type { Fetcher, FetchResponse } from './github.js';
 import { createAwesomeJailbreakAdapter } from './awesome-jailbreak.js';
 
+const createFetcher = (data: Uint8Array): Fetcher =>
+  (_url: string): Promise<FetchResponse> =>
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      arrayBuffer: (): Promise<ArrayBuffer> =>
+        Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
+    });
 const createFetcher = (data: Uint8Array): Fetcher => () =>
   Promise.resolve({
     ok: true,
