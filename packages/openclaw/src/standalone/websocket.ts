@@ -53,8 +53,12 @@ const stringifySocketData = (data: unknown): string => {
     return String(data);
   }
 
-  if (isRecord(data) && typeof data.toString === 'function') {
-    return data.toString();
+  if (isRecord(data)) {
+    try {
+      return JSON.stringify(data);
+    } catch {
+      return '[Unserializable object]';
+    }
   }
 
   return String(data);

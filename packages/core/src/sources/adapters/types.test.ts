@@ -7,7 +7,7 @@ describe('createSourceAdapterRegistry', () => {
     const registry = createSourceAdapterRegistry([
       {
         id: 'example',
-        sync: async () => ({ status: 'success' }),
+        sync: (): Promise<{ status: 'success' }> => Promise.resolve({ status: 'success' }),
       },
     ]);
 
@@ -18,7 +18,7 @@ describe('createSourceAdapterRegistry', () => {
     const registry = createSourceAdapterRegistry([
       {
         id: 'example',
-        sync: async () => ({ status: 'success' }),
+        sync: (): Promise<{ status: 'success' }> => Promise.resolve({ status: 'success' }),
       },
     ]);
 

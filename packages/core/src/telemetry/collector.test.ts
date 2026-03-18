@@ -16,6 +16,7 @@ class StubProvider implements TelemetryProvider {
   }
 
   public async *execute(_messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
+    await Promise.resolve();
     for (const event of this.events) {
       yield event;
     }

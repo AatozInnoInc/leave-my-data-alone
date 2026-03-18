@@ -146,6 +146,7 @@ describe('ScenarioEngine', () => {
     class ExecuteErrorProvider extends StubProvider {
       override async *execute(_messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
         await Promise.resolve();
+        yield* [];
         throw new Error('execute failure');
       }
     }

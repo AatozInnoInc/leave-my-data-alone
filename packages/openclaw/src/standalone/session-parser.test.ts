@@ -53,7 +53,10 @@ describe('parseSessionLine', () => {
     });
     const event = parseSessionLine(line);
     expect(event).not.toBeNull();
-    expect(event!.timestamp.getTime()).toBe(1706000000000);
+    if (!event) {
+      throw new Error('Expected parsed event.');
+    }
+    expect(event.timestamp.getTime()).toBe(1706000000000);
   });
 
   it('should return null for empty string lines', () => {

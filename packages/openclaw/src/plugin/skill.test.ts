@@ -27,13 +27,14 @@ describe('createLmdaSkill', () => {
     const skill = createLmdaSkill({
       workspaceRoot: '/tmp/lmda',
       scenarioRoot: repoRoot,
-      pluginRunner: async ({ messages, eventSink }) => {
+      pluginRunner: ({ messages, eventSink }): Promise<void> => {
         receivedMessages = messages;
         eventSink.handleEvent({
           timestamp: new Date(0),
           type: 'llm_output',
           payload: { content: 'ok' },
         });
+        return Promise.resolve();
       },
     });
 
@@ -43,7 +44,7 @@ describe('createLmdaSkill', () => {
     const output = await skill.execute(input);
     const parsed = JSON.parse(output) as {
       summary?: { total?: number; passed?: number; failed?: number };
-      reports?: Array<{ result?: { passed?: boolean } }>;
+      reports?: { result?: { passed?: boolean } }[];
     };
 
     // Assert

@@ -27,7 +27,7 @@ export interface ScenarioYamlBuilderOptions {
  * Uses fluent interface for readable, composable test data generation.
  */
 export class ScenarioYamlBuilder {
-  private options: Required<ScenarioYamlBuilderOptions> = {
+  private readonly options: Required<ScenarioYamlBuilderOptions> = {
     id: 'test-scenario',
     name: 'Test Scenario',
     description: '',
@@ -175,7 +175,7 @@ export class ScenarioYamlBuilder {
       });
     }
 
-    parts.push(`  memory: ${this.options.memory}`);
+    parts.push(`  memory: ${this.options.memory ? 'true' : 'false'}`);
 
     if (this.options.retrieval.length > 0) {
       parts.push('  retrieval:');
@@ -242,10 +242,10 @@ export class ScenarioYamlBuilder {
             if (typeof value === 'object' && value !== null) {
               parts.push(`        ${key}:`);
               Object.entries(value).forEach(([k, v]) => {
-                parts.push(`          ${k}: "${v}"`);
+                parts.push(`          ${k}: "${String(v)}"`);
               });
             } else {
-              parts.push(`        ${key}: ${value}`);
+              parts.push(`        ${key}: ${String(value)}`);
             }
           });
         });

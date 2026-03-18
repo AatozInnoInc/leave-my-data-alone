@@ -1,15 +1,23 @@
 const js = require('@eslint/js');
 const tseslint = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
+const nodeGlobals = {
+  Buffer: 'readonly',
+  NodeJS: 'readonly',
+  clearTimeout: 'readonly',
+  console: 'readonly',
+  process: 'readonly',
+  setTimeout: 'readonly',
+};
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 module.exports = [
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**'],
   },
   js.configs.recommended,
   {
-    files: ['**/*.ts'],
+    files: ['**/src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -20,6 +28,7 @@ module.exports = [
         tsconfigRootDir: __dirname,
         sourceType: 'module',
       },
+      globals: nodeGlobals,
     },
     plugins: {
       '@typescript-eslint': tseslint,

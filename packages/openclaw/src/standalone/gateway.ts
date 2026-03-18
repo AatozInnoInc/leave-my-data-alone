@@ -28,14 +28,14 @@ const DEFAULT_SCOPES = ['operator.admin'] as const;
 const PROTOCOL_VERSION = 3;
 const CONNECT_DELAY_MS = 750;
 
-type GatewayRequestFrame = {
+interface GatewayRequestFrame {
   readonly type: 'req';
   readonly id: string;
   readonly method: string;
   readonly params?: unknown;
-};
+}
 
-type GatewayResponseFrame = {
+interface GatewayResponseFrame {
   readonly type: 'res';
   readonly id: string;
   readonly ok: boolean;
@@ -43,30 +43,30 @@ type GatewayResponseFrame = {
   readonly error?: {
     readonly message?: unknown;
   };
-};
+}
 
-type GatewayEventFrame = {
+interface GatewayEventFrame {
   readonly type: 'event';
   readonly event: string;
   readonly payload?: unknown;
   readonly seq?: number;
-};
+}
 
-type AgentEventPayload = {
+interface AgentEventPayload {
   readonly runId: string;
   readonly seq?: number;
   readonly stream: string;
   readonly ts: number;
   readonly data: Record<string, unknown>;
-};
+}
 
-type PendingRequest = {
+interface PendingRequest {
   readonly resolve: (value: unknown) => void;
   readonly reject: (error: Error) => void;
   readonly expectFinal: boolean;
-};
+}
 
-type GatewayClientOptions = {
+interface GatewayClientOptions {
   readonly url: string;
   readonly authToken?: string;
   readonly clientId: string;
@@ -75,12 +75,12 @@ type GatewayClientOptions = {
   readonly platform: string;
   readonly role: string;
   readonly scopes: readonly string[];
-};
+}
 
-type MessagePlan = {
+interface MessagePlan {
   readonly userMessages: readonly string[];
   readonly extraSystemPrompt?: string;
-};
+}
 
 const normalizeAgentId = (value: string): string => {
   const trimmed = value.trim().toLowerCase();
@@ -212,7 +212,7 @@ const MAX_EVENT_QUEUE_SIZE = 50_000;
 
 class AsyncQueue<T> implements AsyncIterable<T> {
   private readonly items: T[] = [];
-  private readonly waiters: Array<(result: IteratorResult<T>) => void> = [];
+  private readonly waiters: ((result: IteratorResult<T>) => void)[] = [];
   private closed = false;
 
   public push(value: T): void {
@@ -299,12 +299,10 @@ class OpenClawGatewayClient {
 
   public async connect(): Promise<void> {
     this.connectRequested = true;
-    if (!this.connectPromise) {
-      this.connectPromise = new Promise((resolve, reject) => {
-        this.connectResolve = resolve;
-        this.connectReject = reject;
-      });
-    }
+    this.connectPromise ??= new Promise((resolve, reject) => {
+      this.connectResolve = resolve;
+      this.connectReject = reject;
+    });
     if (this.isOpen) {
       this.queueConnect();
     }
@@ -323,7 +321,7 @@ class OpenClawGatewayClient {
 
     const response = new Promise<T>((resolve, reject) => {
       this.pending.set(id, {
-        resolve: (value) => resolve(value as T),
+        resolve: (value) => { resolve(value as T); },
         reject,
         expectFinal,
       });
@@ -367,7 +365,7 @@ class OpenClawGatewayClient {
         this.connectResolve = null;
         this.connectReject = null;
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         this.connectReject?.(normalizeError(error));
         this.connectResolve = null;
         this.connectReject = null;
@@ -415,29 +413,27 @@ class OpenClawGatewayClient {
       return;
     }
 
-    if (frame.type === 'res') {
-      const pending = this.pending.get(frame.id);
-      if (!pending) {
-        return;
-      }
-
-      const payloadRecord = isRecord(frame.payload) ? frame.payload : undefined;
-      const status = payloadRecord ? asString(payloadRecord.status) : undefined;
-      if (pending.expectFinal && status === 'accepted') {
-        return;
-      }
-
-      this.pending.delete(frame.id);
-      if (frame.ok) {
-        pending.resolve(frame.payload);
-        return;
-      }
-      const message =
-        frame.error && typeof frame.error.message === 'string'
-          ? frame.error.message
-          : 'OpenClaw gateway request failed.';
-      pending.reject(new Error(message));
+    const pending = this.pending.get(frame.id);
+    if (!pending) {
+      return;
     }
+
+    const payloadRecord = isRecord(frame.payload) ? frame.payload : undefined;
+    const status = payloadRecord ? asString(payloadRecord.status) : undefined;
+    if (pending.expectFinal && status === 'accepted') {
+      return;
+    }
+
+    this.pending.delete(frame.id);
+    if (frame.ok) {
+      pending.resolve(frame.payload);
+      return;
+    }
+    const message =
+      frame.error && typeof frame.error.message === 'string'
+        ? frame.error.message
+        : 'OpenClaw gateway request failed.';
+    pending.reject(new Error(message));
   }
 
   private handleClose(code: number, reason: string): void {
@@ -491,7 +487,11 @@ export class StandaloneGateway implements OpenClawAdapter {
       );
     }
 
-    const gatewayUrl = this.options.gatewayUrl?.trim() || DEFAULT_GATEWAY_URL;
+    const configuredGatewayUrl = this.options.gatewayUrl?.trim();
+    const gatewayUrl =
+      configuredGatewayUrl && configuredGatewayUrl.length > 0
+        ? configuredGatewayUrl
+        : DEFAULT_GATEWAY_URL;
     const clientOptions: GatewayClientOptions = {
       url: gatewayUrl,
       ...(this.options.authToken !== undefined && { authToken: this.options.authToken }),
@@ -509,8 +509,16 @@ export class StandaloneGateway implements OpenClawAdapter {
     try {
       await client.connect();
 
-      const agentId = this.options.agentId?.trim() || DEFAULT_AGENT_ID;
-      const sessionKey = this.options.sessionKey?.trim() || buildSessionKey(agentId);
+      const configuredAgentId = this.options.agentId?.trim();
+      const agentId =
+        configuredAgentId && configuredAgentId.length > 0
+          ? configuredAgentId
+          : DEFAULT_AGENT_ID;
+      const configuredSessionKey = this.options.sessionKey?.trim();
+      const sessionKey =
+        configuredSessionKey && configuredSessionKey.length > 0
+          ? configuredSessionKey
+          : buildSessionKey(agentId);
 
       for (const message of plan.userMessages) {
         const runId = randomUUID();
