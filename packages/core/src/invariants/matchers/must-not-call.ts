@@ -24,9 +24,6 @@ const matchArgument = (expected: ArgumentMatch, actual: unknown): boolean => {
       return false;
     }
 
-    return expected.every((entry: ArgumentMatch, index: number) =>
-      matchArgument(entry, actual[index]),
-    );
     const expectedEntries = expected as readonly ArgumentMatch[];
     const actualEntries = actual as readonly unknown[];
     return expectedEntries.every((entry, index) => matchArgument(entry, actualEntries[index]));

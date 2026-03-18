@@ -19,7 +19,7 @@ module.exports = [
   {
     files: ['**/src/**/*.ts'],
     languageOptions: {
-      globals: { ...globals.node },
+      globals: nodeGlobals,
       parser: tsParser,
       parserOptions: {
         project: [
@@ -50,7 +50,7 @@ module.exports = [
   {
     files: ['**/*.config.ts'],
     languageOptions: {
-      globals: globals.node,
+      globals: nodeGlobals,
       parser: tsParser,
       parserOptions: {
         sourceType: 'module',
