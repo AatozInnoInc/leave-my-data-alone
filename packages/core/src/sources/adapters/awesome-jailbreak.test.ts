@@ -17,14 +17,6 @@ const createFetcher = (data: Uint8Array): Fetcher =>
       arrayBuffer: (): Promise<ArrayBuffer> =>
         Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
     });
-const createFetcher = (data: Uint8Array): Fetcher => () =>
-  Promise.resolve({
-    ok: true,
-    status: 200,
-    statusText: 'OK',
-    arrayBuffer: (): Promise<ArrayBuffer> =>
-      Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
-  });
 
 describe('createAwesomeJailbreakAdapter', () => {
   it('should sync the source and write a manifest', async (): Promise<void> => {

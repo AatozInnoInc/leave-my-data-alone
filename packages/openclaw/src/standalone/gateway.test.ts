@@ -17,9 +17,6 @@ class TestWebSocketClient implements OpenClawWebSocketClient {
   private readonly messageHandlers: ((data: string) => void)[] = [];
   private readonly closeHandlers: ((code: number, reason: string) => void)[] = [];
   private readonly errorHandlers: ((error: Error) => void)[] = [];
-  private readonly messageHandlers: ((data: string) => void)[] = [];
-  private readonly closeHandlers: ((code: number, reason: string) => void)[] = [];
-  private readonly errorHandlers: ((error: Error) => void)[] = [];
 
   constructor(url: string) {
     this.url = url;
@@ -82,11 +79,9 @@ vi.mock('./websocket.js', () => ({
 }));
 
 interface SentFrame {
-interface SentFrame {
   readonly id: string;
   readonly method: string;
   readonly params?: Record<string, unknown>;
-}
 }
 
 const parseSentFrame = (socket: TestWebSocketClient, index: number): SentFrame => {

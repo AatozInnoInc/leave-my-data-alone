@@ -9,7 +9,6 @@ describe('createSourceAdapterRegistry', () => {
         id: 'example',
         sync: (): Promise<{ status: 'success' }> =>
           Promise.resolve({ status: 'success' }),
-        sync: (): Promise<{ status: 'success' }> => Promise.resolve({ status: 'success' }),
       },
     ]);
 
@@ -22,7 +21,6 @@ describe('createSourceAdapterRegistry', () => {
         id: 'example',
         sync: (): Promise<{ status: 'success' }> =>
           Promise.resolve({ status: 'success' }),
-        sync: (): Promise<{ status: 'success' }> => Promise.resolve({ status: 'success' }),
       },
     ]);
 

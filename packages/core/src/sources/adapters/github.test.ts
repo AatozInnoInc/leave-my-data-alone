@@ -21,14 +21,6 @@ const createFetcher = (ok: boolean, data: Uint8Array): Fetcher =>
       arrayBuffer: (): Promise<ArrayBuffer> =>
         Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
     });
-const createFetcher = (ok: boolean, data: Uint8Array): Fetcher => () =>
-  Promise.resolve({
-    ok,
-    status: ok ? 200 : 404,
-    statusText: ok ? 'OK' : 'Not Found',
-    arrayBuffer: (): Promise<ArrayBuffer> =>
-      Promise.resolve(data.buffer.slice(0) as ArrayBuffer),
-  });
 
 describe('buildGitHubArchiveUrl', () => {
   it('should build a default archive URL', (): void => {
