@@ -1,23 +1,22 @@
-# Provider Implementation Guide
+# Provider Guide
 
-How to add a new telemetry provider to LMDA.
+Quick guide for adding a new LMDA provider.
 
-## Overview
+## 1) Mental Model
 
-LMDA’s core engine is framework-agnostic. Providers plug in by implementing the `TelemetryProvider` interface and translating framework-specific events into a single `TelemetryEvent` stream.
+LMDA core runs scenarios. Your provider bridges LMDA to a specific agent framework.
 
 ```mermaid
-flowchart TB
+flowchart LR
   subgraph core["@lmda/core"]
-    engine[Engine, invariants, CLI]
+    engine["Scenario engine + invariants + reporters"]
   end
-  engine --> iface[TelemetryProvider interface]
-  iface --> openclaw[OpenClaw]
-  iface --> langchain[LangChain]
-  iface --> custom[Custom]
+  engine --> contract["TelemetryProvider contract"]
+  contract --> providerA["OpenClaw provider"]
+  contract --> providerB["Future provider"]
 ```
 
-## The TelemetryProvider Interface
+## 2) Contract You Must Implement
 
 ```typescript
 import type { Message, ScenarioConfig, TelemetryEvent } from '@lmda/core';
@@ -29,37 +28,39 @@ interface TelemetryProvider {
 }
 ```
 
+### Lifecycle
+
 ```mermaid
 sequenceDiagram
   participant LMDA
   participant Provider
   LMDA->>Provider: configure(scenario)
   LMDA->>Provider: execute(messages)
-  loop Events
-    Provider-->>LMDA: yield TelemetryEvent
+  loop Stream events
+    Provider-->>LMDA: TelemetryEvent
   end
   LMDA->>Provider: teardown()
 ```
 
-- **configure**: Before each run: set up agent environment (workspace, tools, memory), sandbox, and framework connections
-- **execute**: Send attack messages to the agent; yield telemetry events as they occur (async generator, real-time stream)
-- **teardown**: After each run: close connections, clean up temp resources, reset agent state
+| Method | Purpose | Done when |
+|---|---|---|
+| `configure` | Prepare runtime, tools, memory, workspace | Run can begin safely |
+| `execute` | Send attack messages and yield telemetry | All relevant events emitted |
+| `teardown` | Clean up resources and close connections | No leaked state or handles |
 
-## TelemetryEvent Types
+## 3) Telemetry Events
 
-Emit these event types from your provider:
+Emit only these event types:
 
-| Type | When to emit |
-|------|--------------|
-| `tool_call_start` | Agent begins a tool invocation |
-| `tool_call_end` | Tool invocation completes |
-| `llm_output` | Complete LLM response |
-| `llm_output_chunk` | Streaming LLM chunk |
-| `memory_read` | Agent reads from memory/context |
-| `memory_write` | Agent writes to memory/context |
-| `retrieval_inject` | Content injected via RAG |
-| `user_confirmation_requested` | Agent asks for consent |
-| `user_confirmation_response` | User consent response |
+- `tool_call_start`
+- `tool_call_end`
+- `llm_output`
+- `llm_output_chunk`
+- `memory_read`
+- `memory_write`
+- `retrieval_inject`
+- `user_confirmation_requested`
+- `user_confirmation_response`
 
 Event shape:
 
@@ -71,42 +72,30 @@ interface TelemetryEvent {
 }
 ```
 
-`payload` is free-form but should match the event type (e.g. `tool_call_start` includes tool name and args):
+Use payloads that match the event meaning. For example, `tool_call_start` should include tool name and args.
 
-```typescript
-{
-  timestamp: new Date(),
-  type: 'tool_call_start',
-  payload: { tool: 'email.send', args: { to: 'user@example.com', subject: 'Test' } }
-}
-```
-
-## Implementation Checklist
-
-1. Add package: `packages/your-provider/`
-2. Implement `TelemetryProvider` and map framework events to `TelemetryEvent`
-3. Manage connection lifecycle and errors with clear types
-4. Add tests for all event types
-5. Export a factory from `index.ts`
-
-## Package Layout
+## 4) Recommended Package Layout
 
 ```mermaid
-flowchart LR
-  subgraph pkg["packages/your-provider/"]
-    index["index.ts"]
-    provider["provider.ts"]
-    mapper["telemetry/mapper.ts"]
+flowchart TB
+  subgraph pkg["packages/your-provider/src"]
+    idx["index.ts (public exports)"]
+    prov["provider.ts (contract implementation)"]
+    map["telemetry/mapper.ts (framework -> LMDA events)"]
   end
-  index --> provider
-  provider --> mapper
+  idx --> prov
+  prov --> map
 ```
 
-- `src/index.ts`: Public exports
-- `src/provider.ts`: `TelemetryProvider` implementation
-- `src/telemetry/mapper.ts`: Framework events to `TelemetryEvent`
+## 5) Build Plan
 
-## Minimal Provider Example
+1. Create `packages/your-provider/` with tsconfig, vitest, and tsup config.
+2. Implement `TelemetryProvider` in `provider.ts`.
+3. Map framework-native events to LMDA `TelemetryEvent`.
+4. Add tests for lifecycle, event mapping, and failure paths.
+5. Export only public API from `src/index.ts`.
+
+## 6) Minimal Skeleton
 
 ```typescript
 import type {
@@ -117,23 +106,28 @@ import type {
 } from '@lmda/core';
 
 export class MyProvider implements TelemetryProvider {
-  async configure(scenario: ScenarioConfig): Promise<void> {
-    // Set up agent environment
+  async configure(_scenario: ScenarioConfig): Promise<void> {}
+
+  async *execute(_messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
+    // Yield framework events mapped to LMDA TelemetryEvent
   }
 
-  async *execute(messages: readonly Message[]): AsyncGenerator<TelemetryEvent> {
-    for (const event of await this.runAgent(messages)) {
-      yield this.mapEvent(event);
-    }
-  }
-
-  async teardown(): Promise<void> {
-    // Clean up
-  }
+  async teardown(): Promise<void> {}
 }
 ```
 
-## Reference and Rules
+## 7) Quality Gates
 
-- **Reference:** `@lmda/openclaw` implements the full interface with standalone (WebSocket) and plugin (middleware) modes
-- **Rules:** Do not change the `TelemetryProvider` interface without a design review. No `any`. Keep the provider independent of `@lmda/core` internals. Export only from `index.ts`. Follow `docs/CONTRIBUTING.md`
+- No `any`
+- No change to `TelemetryProvider` without design review
+- Provider package stays independent from `@lmda/core` internals
+- Strong error handling with typed errors and context
+- Tests cover success and failure cases
+
+## 8) Reference
+
+Use `@lmda/openclaw` as the reference implementation for:
+
+- Standalone mode (WebSocket + session parsing)
+- Plugin mode (middleware event sink)
+- End-to-end provider lifecycle

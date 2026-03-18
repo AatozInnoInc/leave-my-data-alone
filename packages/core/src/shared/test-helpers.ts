@@ -175,7 +175,7 @@ export class ScenarioYamlBuilder {
       });
     }
 
-    parts.push(`  memory: ${String(this.options.memory)}`);
+    parts.push(`  memory: ${this.options.memory ? 'true' : 'false'}`);
 
     if (this.options.retrieval.length > 0) {
       parts.push('  retrieval:');

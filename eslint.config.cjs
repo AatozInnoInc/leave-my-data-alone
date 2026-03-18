@@ -1,25 +1,25 @@
 const js = require('@eslint/js');
 const tseslint = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
-const globals = require('globals');
+const nodeGlobals = {
+  Buffer: 'readonly',
+  NodeJS: 'readonly',
+  clearTimeout: 'readonly',
+  console: 'readonly',
+  process: 'readonly',
+  setTimeout: 'readonly',
+};
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 module.exports = [
   {
-    ignores: [
-      'dist/**',
-      'node_modules/**',
-      'coverage/**',
-      '**/tsup.config.ts',
-      '**/vitest.config.ts',
-    ],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**'],
   },
   js.configs.recommended,
   {
-    files: ['**/*.ts'],
-    ignores: ['**/*.config.ts'],
+    files: ['**/src/**/*.ts'],
     languageOptions: {
-      globals: { ...globals.node },
+      globals: nodeGlobals,
       parser: tsParser,
       parserOptions: {
         project: [
@@ -29,6 +29,7 @@ module.exports = [
         tsconfigRootDir: __dirname,
         sourceType: 'module',
       },
+      globals: nodeGlobals,
     },
     plugins: {
       '@typescript-eslint': tseslint,
@@ -49,7 +50,7 @@ module.exports = [
   {
     files: ['**/*.config.ts'],
     languageOptions: {
-      globals: globals.node,
+      globals: nodeGlobals,
       parser: tsParser,
       parserOptions: {
         sourceType: 'module',

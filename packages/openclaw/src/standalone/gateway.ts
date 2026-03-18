@@ -321,9 +321,7 @@ class OpenClawGatewayClient {
 
     const response = new Promise<T>((resolve, reject) => {
       this.pending.set(id, {
-        resolve: (value) => {
-          resolve(value as T);
-        },
+        resolve: (value) => { resolve(value as T); },
         reject,
         expectFinal,
       });
@@ -415,7 +413,6 @@ class OpenClawGatewayClient {
       return;
     }
 
-    // parseGatewayFrame returns only 'res' | 'event'; all 'event' branches return above, so frame is 'res' here.
     const pending = this.pending.get(frame.id);
     if (!pending) {
       return;
@@ -490,7 +487,11 @@ export class StandaloneGateway implements OpenClawAdapter {
       );
     }
 
-    const gatewayUrl = this.options.gatewayUrl?.trim() ?? DEFAULT_GATEWAY_URL;
+    const configuredGatewayUrl = this.options.gatewayUrl?.trim();
+    const gatewayUrl =
+      configuredGatewayUrl && configuredGatewayUrl.length > 0
+        ? configuredGatewayUrl
+        : DEFAULT_GATEWAY_URL;
     const clientOptions: GatewayClientOptions = {
       url: gatewayUrl,
       ...(this.options.authToken !== undefined && { authToken: this.options.authToken }),
@@ -508,8 +509,16 @@ export class StandaloneGateway implements OpenClawAdapter {
     try {
       await client.connect();
 
-      const agentId = this.options.agentId?.trim() ?? DEFAULT_AGENT_ID;
-      const sessionKey = this.options.sessionKey?.trim() ?? buildSessionKey(agentId);
+      const configuredAgentId = this.options.agentId?.trim();
+      const agentId =
+        configuredAgentId && configuredAgentId.length > 0
+          ? configuredAgentId
+          : DEFAULT_AGENT_ID;
+      const configuredSessionKey = this.options.sessionKey?.trim();
+      const sessionKey =
+        configuredSessionKey && configuredSessionKey.length > 0
+          ? configuredSessionKey
+          : buildSessionKey(agentId);
 
       for (const message of plan.userMessages) {
         const runId = randomUUID();

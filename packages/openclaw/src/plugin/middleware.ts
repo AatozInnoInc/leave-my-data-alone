@@ -138,7 +138,6 @@ export class PluginGateway implements OpenClawAdapter {
     this.isExecuting = true;
     const queue = new AsyncQueue<TelemetryEvent>();
     this.activeQueue = queue;
-    let runError: Error | null = null;
 
     const eventSink: OpenClawEventSink = {
       handleEvent: (event: TelemetryEvent) => {
@@ -146,11 +145,10 @@ export class PluginGateway implements OpenClawAdapter {
       },
     };
 
-    const runPromise = Promise.resolve()
+    const runPromise: Promise<Error | null> = Promise.resolve()
       .then(() => runner({ messages, eventSink }))
-      .catch((error: unknown) => {
-        runError = normalizeError(error);
-      })
+      .then(() => null)
+      .catch((error: unknown) => normalizeError(error))
       .finally(() => {
         queue.close();
         this.activeQueue = null;
@@ -161,13 +159,10 @@ export class PluginGateway implements OpenClawAdapter {
       yield event;
     }
 
-    await runPromise;
-
-    // runError is set in .catch(); type checker narrows it to null after await.
-    const err = runError as Error | null;
-    if (err instanceof Error) {
+    const runError = await runPromise;
+    if (runError !== null) {
       throw new OpenClawProviderError('plugin', 'Plugin gateway execution failed.', {
-        cause: err,
+        cause: runError,
       });
     }
   }

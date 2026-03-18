@@ -2,7 +2,7 @@
 
 import { WebSocket } from 'ws';
 
-import { normalizeError } from '../shared/type-guards.js';
+import { isRecord, normalizeError } from '../shared/type-guards.js';
 
 export interface OpenClawWebSocketClient {
   readonly url: string;
@@ -51,6 +51,14 @@ const stringifySocketData = (data: unknown): string => {
     // Chunked message with non-Buffer entries; avoid producing "[object Object]".
     console.warn('[OpenClaw] WebSocket message array contained non-Buffer entries; treating as unexpected.');
     return String(data);
+  }
+
+  if (isRecord(data)) {
+    try {
+      return JSON.stringify(data);
+    } catch {
+      return '[Unserializable object]';
+    }
   }
 
   return String(data);

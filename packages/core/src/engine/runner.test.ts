@@ -148,6 +148,7 @@ describe('ScenarioEngine', () => {
         await Promise.resolve();
         yield { timestamp: new Date(0), type: 'llm_output', payload: {} };
         // Throw is reachable on next generator iteration.
+        yield* [];
         throw new Error('execute failure');
       }
     }

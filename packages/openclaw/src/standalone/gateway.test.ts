@@ -280,13 +280,15 @@ describe('StandaloneGateway', () => {
 
     expect(events).toHaveLength(5);
     const [e0, e1, e2, e3, e4] = events;
-    // toHaveLength(5) above guarantees e0..e4 defined; ?. is defensive for lint.
-    expect(e0?.payload).toMatchObject({ tool: 'shell.exec' });
-    expect(e1?.payload).toMatchObject({ tool: 'shell.exec' });
-    expect(e2?.payload).toMatchObject({ content: 'he' });
-    expect(e3?.payload).toMatchObject({ content: 'llo' });
-    expect(e4?.payload).toMatchObject({ content: 'hello' });
-    expect(e4?.timestamp.getTime()).toBe(4);
+    if (!e0 || !e1 || !e2 || !e3 || !e4) {
+      throw new Error('Expected five telemetry events.');
+    }
+    expect(e0.payload).toMatchObject({ tool: 'shell.exec' });
+    expect(e1.payload).toMatchObject({ tool: 'shell.exec' });
+    expect(e2.payload).toMatchObject({ content: 'he' });
+    expect(e3.payload).toMatchObject({ content: 'llo' });
+    expect(e4.payload).toMatchObject({ content: 'hello' });
+    expect(e4.timestamp.getTime()).toBe(4);
   });
 
   it('rejects when WebSocket errors before handshake completes', async () => {
@@ -487,11 +489,15 @@ describe('StandaloneGateway', () => {
     const events = await eventsPromise;
     const llmOutputs = events.filter((e) => e.type === 'llm_output');
     expect(llmOutputs).toHaveLength(2);
-    // toHaveLength(2) guarantees indices 0 and 1 defined; ?. satisfies no-non-null-assertion.
+    const firstOutput = llmOutputs[0];
+    const secondOutput = llmOutputs[1];
+    if (!firstOutput || !secondOutput) {
+      throw new Error('Expected two llm_output events.');
+    }
     // Note: these are the mocked assistant `text` values from the `agent` events above, not an
     // echo of the input messages ("first" / "second").
-    expect(llmOutputs[0]?.payload).toMatchObject({ content: 'one' });
-    expect(llmOutputs[1]?.payload).toMatchObject({ content: 'two' });
+    expect(firstOutput.payload).toMatchObject({ content: 'one' });
+    expect(secondOutput.payload).toMatchObject({ content: 'two' });
   });
 
   it('teardown closes client and iterator rejects when pending', async () => {
@@ -535,7 +541,7 @@ describe('StandaloneGateway', () => {
     );
     // We intentionally do NOT emit the final response frame for the agent request.
     // teardown() should close the client and reject pending requests.
-    void gateway.teardown();
+    await gateway.teardown();
 
     await expect(eventsPromise).rejects.toThrow();
   });
